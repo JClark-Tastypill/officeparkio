@@ -446,7 +446,7 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 200, y: 40, z: 30}
+  m_Size: {x: 193.3, y: 40, z: 30}
   m_Center: {x: 0, y: 9.3, z: 0}
 --- !u!54 &45298603
 Rigidbody:
@@ -457,7 +457,7 @@ Rigidbody:
   m_GameObject: {fileID: 45298601}
   serializedVersion: 2
   m_Mass: 100
-  m_Drag: 0
+  m_Drag: 1
   m_AngularDrag: 0.05
   m_UseGravity: 1
   m_IsKinematic: 0
@@ -5096,6 +5096,16 @@ PrefabInstance:
       propertyPath: m_Name
       value: big plant (4)
       objectReference: {fileID: 0}
+    - target: {fileID: 3364381593445737263, guid: 4605f2c5e05534db98a269dd81194f66,
+        type: 3}
+      propertyPath: m_TagString
+      value: obstacle
+      objectReference: {fileID: 0}
+    - target: {fileID: 3364381593445737263, guid: 4605f2c5e05534db98a269dd81194f66,
+        type: 3}
+      propertyPath: m_Layer
+      value: 10
+      objectReference: {fileID: 0}
     - target: {fileID: 3367481327005953449, guid: 4605f2c5e05534db98a269dd81194f66,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -5741,6 +5751,16 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 3364381593445737263, guid: 4605f2c5e05534db98a269dd81194f66,
+        type: 3}
+      propertyPath: m_TagString
+      value: obstacle
+      objectReference: {fileID: 0}
+    - target: {fileID: 3364381593445737263, guid: 4605f2c5e05534db98a269dd81194f66,
+        type: 3}
+      propertyPath: m_Layer
+      value: 10
+      objectReference: {fileID: 0}
     - target: {fileID: 3367481327005953449, guid: 4605f2c5e05534db98a269dd81194f66,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -6166,6 +6186,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: big plant (3)
+      objectReference: {fileID: 0}
+    - target: {fileID: 3364381593445737263, guid: 4605f2c5e05534db98a269dd81194f66,
+        type: 3}
+      propertyPath: m_TagString
+      value: obstacle
+      objectReference: {fileID: 0}
+    - target: {fileID: 3364381593445737263, guid: 4605f2c5e05534db98a269dd81194f66,
+        type: 3}
+      propertyPath: m_Layer
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 3367481327005953449, guid: 4605f2c5e05534db98a269dd81194f66,
         type: 3}
@@ -6979,7 +7009,7 @@ Rigidbody:
   m_GameObject: {fileID: 784705991}
   serializedVersion: 2
   m_Mass: 100
-  m_Drag: 0
+  m_Drag: 1
   m_AngularDrag: 0.05
   m_UseGravity: 1
   m_IsKinematic: 0
@@ -7228,6 +7258,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: big plant (6)
+      objectReference: {fileID: 0}
+    - target: {fileID: 3364381593445737263, guid: 4605f2c5e05534db98a269dd81194f66,
+        type: 3}
+      propertyPath: m_TagString
+      value: obstacle
+      objectReference: {fileID: 0}
+    - target: {fileID: 3364381593445737263, guid: 4605f2c5e05534db98a269dd81194f66,
+        type: 3}
+      propertyPath: m_Layer
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 3367481327005953449, guid: 4605f2c5e05534db98a269dd81194f66,
         type: 3}
@@ -8125,7 +8165,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isAlive: 0
-  isWandering: 0
   isAgro: 0
   hasTarget: 0
   moveCDMin: 0
@@ -8137,7 +8176,6 @@ MonoBehaviour:
   targetEnemy: {fileID: 0}
   minTargetRange: 0
   maxTargetRange: 0
-  moveSpread: 0
   minMove: 0
   maxMove: 0
   newTargetDistance: 0
@@ -8150,12 +8188,8 @@ MonoBehaviour:
   agroTimerStamp: 0
   agroCDStamp: 0
   rotationSpeed: 0
-  minRotateThreshhold: 0
-  agroRotSpeed: 0
   targetCD: 0
   targetCDStamp: 0
-  ranChanceWorseOption: 0
-  chanceRunAway: 0
   otherPlayers: []
   closestTarget: {fileID: 0}
   closestTargetDistance: 0
@@ -8707,6 +8741,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: big plant (1)
+      objectReference: {fileID: 0}
+    - target: {fileID: 3364381593445737263, guid: 4605f2c5e05534db98a269dd81194f66,
+        type: 3}
+      propertyPath: m_TagString
+      value: obstacle
+      objectReference: {fileID: 0}
+    - target: {fileID: 3364381593445737263, guid: 4605f2c5e05534db98a269dd81194f66,
+        type: 3}
+      propertyPath: m_Layer
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 3367481327005953449, guid: 4605f2c5e05534db98a269dd81194f66,
         type: 3}
@@ -11485,6 +11529,10 @@ PrefabInstance:
       propertyPath: dashTime
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 452089541, guid: ae39200c020c64ff8bd4b89840023683, type: 3}
+      propertyPath: isDashing
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 2672166801190889352, guid: ae39200c020c64ff8bd4b89840023683,
         type: 3}
       propertyPath: m_Drag
@@ -11558,7 +11606,7 @@ PrefabInstance:
     - target: {fileID: 2672166801190889398, guid: ae39200c020c64ff8bd4b89840023683,
         type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2672166801190889399, guid: ae39200c020c64ff8bd4b89840023683,
         type: 3}
@@ -13081,6 +13129,10 @@ PrefabInstance:
       propertyPath: dashTime
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 452089541, guid: ae39200c020c64ff8bd4b89840023683, type: 3}
+      propertyPath: isDashing
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 2672166801190889352, guid: ae39200c020c64ff8bd4b89840023683,
         type: 3}
       propertyPath: m_Drag
@@ -13154,7 +13206,7 @@ PrefabInstance:
     - target: {fileID: 2672166801190889398, guid: ae39200c020c64ff8bd4b89840023683,
         type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2672166801190889399, guid: ae39200c020c64ff8bd4b89840023683,
         type: 3}
@@ -13420,6 +13472,16 @@ PrefabInstance:
       propertyPath: m_Name
       value: big plant (7)
       objectReference: {fileID: 0}
+    - target: {fileID: 3364381593445737263, guid: 4605f2c5e05534db98a269dd81194f66,
+        type: 3}
+      propertyPath: m_TagString
+      value: obstacle
+      objectReference: {fileID: 0}
+    - target: {fileID: 3364381593445737263, guid: 4605f2c5e05534db98a269dd81194f66,
+        type: 3}
+      propertyPath: m_Layer
+      value: 10
+      objectReference: {fileID: 0}
     - target: {fileID: 3367481327005953449, guid: 4605f2c5e05534db98a269dd81194f66,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -13581,7 +13643,7 @@ BoxCollider:
   m_IsTrigger: 0
   m_Enabled: 1
   serializedVersion: 2
-  m_Size: {x: 200, y: 40, z: 30}
+  m_Size: {x: 193.3, y: 40, z: 30}
   m_Center: {x: 0, y: 9.3, z: 0}
 --- !u!54 &1369399999
 Rigidbody:
@@ -13592,7 +13654,7 @@ Rigidbody:
   m_GameObject: {fileID: 1369399997}
   serializedVersion: 2
   m_Mass: 100
-  m_Drag: 0
+  m_Drag: 1
   m_AngularDrag: 0.05
   m_UseGravity: 1
   m_IsKinematic: 0
@@ -14599,6 +14661,16 @@ PrefabInstance:
       propertyPath: m_Name
       value: big plant (8)
       objectReference: {fileID: 0}
+    - target: {fileID: 3364381593445737263, guid: 4605f2c5e05534db98a269dd81194f66,
+        type: 3}
+      propertyPath: m_TagString
+      value: obstacle
+      objectReference: {fileID: 0}
+    - target: {fileID: 3364381593445737263, guid: 4605f2c5e05534db98a269dd81194f66,
+        type: 3}
+      propertyPath: m_Layer
+      value: 10
+      objectReference: {fileID: 0}
     - target: {fileID: 3367481327005953449, guid: 4605f2c5e05534db98a269dd81194f66,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -14780,6 +14852,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: big plant (2)
+      objectReference: {fileID: 0}
+    - target: {fileID: 3364381593445737263, guid: 4605f2c5e05534db98a269dd81194f66,
+        type: 3}
+      propertyPath: m_TagString
+      value: obstacle
+      objectReference: {fileID: 0}
+    - target: {fileID: 3364381593445737263, guid: 4605f2c5e05534db98a269dd81194f66,
+        type: 3}
+      propertyPath: m_Layer
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 3367481327005953449, guid: 4605f2c5e05534db98a269dd81194f66,
         type: 3}
@@ -16767,7 +16849,7 @@ Rigidbody:
   m_GameObject: {fileID: 1654247182}
   serializedVersion: 2
   m_Mass: 100
-  m_Drag: 0
+  m_Drag: 1
   m_AngularDrag: 0.05
   m_UseGravity: 1
   m_IsKinematic: 0
@@ -20491,6 +20573,10 @@ PrefabInstance:
       propertyPath: dashTime
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 452089541, guid: ae39200c020c64ff8bd4b89840023683, type: 3}
+      propertyPath: isDashing
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 2672166801190889352, guid: ae39200c020c64ff8bd4b89840023683,
         type: 3}
       propertyPath: m_Drag
@@ -20564,7 +20650,7 @@ PrefabInstance:
     - target: {fileID: 2672166801190889398, guid: ae39200c020c64ff8bd4b89840023683,
         type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2672166801190889407, guid: ae39200c020c64ff8bd4b89840023683,
         type: 3}
@@ -21366,6 +21452,16 @@ PrefabInstance:
         type: 3}
       propertyPath: m_Name
       value: big plant
+      objectReference: {fileID: 0}
+    - target: {fileID: 3364381593445737263, guid: 4605f2c5e05534db98a269dd81194f66,
+        type: 3}
+      propertyPath: m_TagString
+      value: obstacle
+      objectReference: {fileID: 0}
+    - target: {fileID: 3364381593445737263, guid: 4605f2c5e05534db98a269dd81194f66,
+        type: 3}
+      propertyPath: m_Layer
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 3367481327005953449, guid: 4605f2c5e05534db98a269dd81194f66,
         type: 3}
@@ -22411,7 +22507,7 @@ PrefabInstance:
     - target: {fileID: 3273784629784516809, guid: 8b6ad761be08e4e1eadd7076808e8ba7,
         type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3273784629784516853, guid: 8b6ad761be08e4e1eadd7076808e8ba7,
         type: 3}

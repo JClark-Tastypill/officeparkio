@@ -37,7 +37,6 @@ public class PlayerMovement : MonoBehaviour
         DebugMenu.instance.CreateDebugSlider("dash cooldown", Color.black, kickCD, 1, 0);
         DebugMenu.instance.CreateDebugSlider("swipe time", Color.black, swipeTouchTime, 1, 0);
 
-
     }
 
 
@@ -85,7 +84,7 @@ public class PlayerMovement : MonoBehaviour
             {
                 if (canKick)
                 {
-                    doKick(new Vector3(inputDiff.x, 0, inputDiff.y).normalized);
+                    //doKick(new Vector3(inputDiff.x, 0, inputDiff.y).normalized);
                 }
             }
             // check to see if player swipes to do a big kick in that direction

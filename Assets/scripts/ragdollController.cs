@@ -122,6 +122,7 @@ public class ragdollController : MonoBehaviour
 
         toggleChairColliders(true);
         gameObject.SetActive(false);
+        myParent.gameObject.SetActive(false);
         
         
     }

@@ -52,9 +52,13 @@ public class collisionDetector : MonoBehaviour
 
                     if (myVel < collision.gameObject.GetComponent<collisionDetector>().myVel && GetComponent<swipeToMove>().isAlive)
                     {
-                        Debug.Log("player tries to fall over");
+                        //Debug.Log("player tries to fall over");
                         newCalculateProbability(collision);
                         goOnCD();
+                    }
+                    else
+                    {
+                        //Debug.Log("actually they fall over");
                     }
                 }
                 else

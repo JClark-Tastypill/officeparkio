@@ -22093,22 +22093,28 @@ MonoBehaviour:
   accelerationSpeed:
     value: 225
   decelerationSpeed:
-    value: 30
+    value: 30.29162
   rotationSpeed:
     value: 10
   dashForce:
-    value: 80
+    value: 139.74731
   dashSwipeLength:
-    value: 250
+    value: 20.699892
   kickCD:
-    value: 0.25
+    value: 0.06889657
   lastPlayerInput: {x: 0, y: 0, z: 0}
   swipeTouchTime:
-    value: 0.1
+    value: 0.5023464
   canKick: 1
   beingBumped: 0
   bumpTime: 0.5
   bumpStamp: 0
+  maxDashSwipeLength:
+    value: 185.81496
+  minDashForce:
+    value: 80.80932
+  sameTouchSwipeDist:
+    value: 175
 --- !u!114 &5138103069064814508
 MonoBehaviour:
   m_ObjectHideFlags: 0

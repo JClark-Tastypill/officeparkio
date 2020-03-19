@@ -228,7 +228,7 @@ public class collisionDetector : MonoBehaviour
 
     public void newCalculateProbability(Collision c)
     {
-        Debug.Log("calculating");
+        //Debug.Log("calculating");
 
         float chance = basicProbability + (extraChance * (c.relativeVelocity.magnitude / maxVel));
         if (chance > basicProbability + extraChance)

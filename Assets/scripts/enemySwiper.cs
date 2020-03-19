@@ -5,39 +5,43 @@ using UnityEngine;
 public class enemySwiper : MonoBehaviour
 {
     public bool isAlive, isAgro, hasTarget;
-    public float moveCDMin, moveCDMax, moveCDStamp;
-    public float agroCDMin, agroCDMax;
+    //public float moveCDMin, moveCDMax, moveCDStamp;
+    //public float agroCDMin, agroCDMax;
+    public float roamTime, agroTime, bumpTime, dashTime, dashCDTime;
+    public float moveStamp; // only stamp used to determine when enemy should make their next move
+    public float dashStamp; // so enemies only dash once in a while, it's on a cooldown
+    public bool canDash;
     public Vector3 target;
     public GameObject targetEnemy;
+    public float reachTargetRange;
     public float minTargetRange, maxTargetRange;
     public float minMove, maxMove, newTargetDistance;
     public float agroMinMove, agroMaxMove;
     public Rigidbody rb;
-    public float agroLeashRange, agroTime, agroCD, agroTimerStamp, agroCDStamp;
+    public float agroLeashRange;//, agroTime, agroCD, agroTimerStamp, agroCDStamp;
     public float rotationSpeed;
-    public float targetCD, targetCDStamp;
+    //public float targetCD, targetCDStamp;
     public GameObject[] otherPlayers;
     public GameObject closestTarget;
     public float closestTargetDistance;
     public Vector3 closestTargetDir;
     public float rayLength, bestAngleDist, minMoveDistance;
-    public bool isSlow;
-    public float chanceSlow, slowCDTime, slowCDStamp, slowTime, slowTimeStamp; // chance of being slow, how long the cooldown is before they can be slow again, how long they are slow for
-    private bool seesPlayer;
+    public bool seesPlayer;
     public float curMoveSpeed;
     public Vector3 curTargetDir;
     public bool beingBumped;
-    public float bumpTime, bumpStamp;
+    //public float bumpTime, bumpStamp;
     public float dashRange;
     public bool isDashing = true;
     public float dashForce;
-    public float dashTime, dashStamp;
-
-    private enum EnemyState
+    public float bumpForce;
+    
+    public enum EnemyState
     {
         None,
         Roam,
         Aggro,
+        Dash,
         Bumped
     };
     private EnemyState currentState = EnemyState.None;
@@ -46,97 +50,10 @@ public class enemySwiper : MonoBehaviour
     {
         
         rb = GetComponent<Rigidbody>();
-        findOthers();
-        determineState();
-       /* findOthers();
-        pathFind();
-        newMoveSpeed(false);*/
+        findOthers(); // runs once, creates array of other players in the stage
+        determineState(); 
     }
-
-  /*  void Update()
-    {
-        /*
-         *set target destination
-         *          - make sure not by  wall/ big thing
-         * make random swips towards that area
-         * if close enough, set new target
-         * if agro by another player, set that player as target while they are in range
-         *
-         *
-         * */
-
-        
-        //knockback = Vector3.MoveTowards(knockback, Vector3.zero, Time.fixedDeltaTime);
-        //rbody.MovePosition((knockback + moveDirection) * Time.fixedDeltaTime);
     
-
-
-
-    /* if(beingBumped)
-     {
-         if(Time.time >= bumpStamp)
-         {
-             beingBumped = false;
-         }
-     }
-     else
-     {
-         faceTarget();
-         if (isAgro)
-         {
-             if (Vector3.Distance(transform.position, targetEnemy.transform.position) > agroLeashRange || Time.time >= agroTimerStamp)
-             {
-                 isAgro = false;
-                 agroCDStamp = Time.time + agroCD;
-
-             }
-             if (Time.time >= moveCDStamp)
-             {
-                 if(Vector3.Distance(transform.position, targetEnemy.transform.position) <= dashRange)
-                 {
-                     if(Time.time >= dashStamp)
-                     {
-                         doDash();
-                     }   
-                 }
-                 else
-                 {
-                     if (seesPlayer)
-                     {
-                         pathFind();
-                         newMoveSpeed(true);
-                     }
-                     else
-                     {
-                         randomPathfind();
-                         newMoveSpeed(true);
-                     }
-                 }
-             }
-         }
-         else
-         {
-             if (Vector3.Distance(transform.position, target) <= newTargetDistance || Time.time >= targetCDStamp)
-             {
-
-                 if (seesPlayer)
-                 {
-                     pathFind();
-                     newMoveSpeed(false);
-                     //moveCDStamp = Time.time + m
-                 }
-                 else
-                 {
-                     randomPathfind();
-                     newMoveSpeed(false);
-                 }
-             }
-         }
-     }
-
-
- }*/
-
  public void FixedUpdate()
  {
         if (!isAlive)
@@ -153,62 +70,161 @@ public class enemySwiper : MonoBehaviour
             case EnemyState.Aggro:
                 moveDirection = HandleAggro();
                 break;
+            case EnemyState.Dash:
+                moveDirection = HandleDash();
+                break;
             case EnemyState.Bumped:
                 moveDirection = HandleBumped();
                 break;
 
         }
+
         steadyMove(moveDirection);
  }
     public void gotoRoam()
     {
+        Debug.Log("go to roam");
         checkClosestPlayer();
-        pathFind();
-        newMoveSpeed(false);
+        if (Time.fixedTime >= dashStamp)
+        {
+            if (seesPlayer)
+            {
+                pathFind();
+            }
+            else
+            {
+                randomPathfind(); // if player just made a dash, move in random direction
+            }
+        }
+        else
+        {
+            randomPathfind();
+        }
+        newMoveSpeed(1);
+        moveStamp = Time.time + roamTime;
         currentState = EnemyState.Roam;
     }
 
     public void goToAggro()
     {
-        newMoveSpeed(true);
+        Debug.Log("go to aggro");
+        checkClosestPlayer();
+        pathFind();
+        newMoveSpeed(2);
+        moveStamp = Time.time + agroTime;
         currentState = EnemyState.Aggro;
+    }
+
+    public void goToDash()
+    {
+        Debug.Log("go to dash");
+        checkClosestPlayer();
+        pathFind();
+        newMoveSpeed(3);
+        moveStamp = Time.time + dashTime;
+        
+        currentState = EnemyState.Dash;
     }
 
     public void goToBumped()
     {
-        newMoveSpeed(false);
+        Debug.Log("go to bumped");
+        //newMoveSpeed(false);
+        newMoveSpeed(4);
+        moveStamp = Time.time + bumpTime;
         currentState = EnemyState.Bumped;
     }
 
     public Vector3 HandleRoam() 
     {
-        return Vector3.up;
+        /*if time is up or reach target, next move
+         *
+         *
+         */
+        //Debug.Log("distance to target: " + Vector3.Distance(transform.position, target) + ", target range: " + reachTargetRange);
+        if(Vector3.Distance(transform.position, target) <= reachTargetRange || Time.fixedTime>= moveStamp)
+        {
+            
+            determineState();
+        }
+        faceTarget();
+        return target;
     }
     public Vector3 HandleAggro()
     {
-        return Vector3.up;
-    }
-    public Vector3 HandleBumped()
-    {
-        return Vector3.up;
-    }
-
-    public void determineState()
-    {
-        checkClosestPlayer();
-        if (seesPlayer)
+        //if time is up , next move
+        if (Vector3.Distance(transform.position, target) >= agroLeashRange || Time.fixedTime >= moveStamp || Vector3.Distance(transform.position, target) <= reachTargetRange)
         {
-            closestTargetDir = (transform.position - closestTarget.transform.position);
-            if (closestTargetDistance <= agroLeashRange && Time.time >= agroCDStamp)
+            determineState();
+        }
+        if(Vector3.Distance(transform.position, target) <= dashRange)
+        {
+            if(Time.fixedTime >= dashStamp)
             {
-                //becomeAgro(closestTarget);
-                goToAggro();
+                goToDash();
             }
             else
             {
+                determineState();
+            }
+            
+        }
+
+            // if close enough for a dash, do a dash
+            faceTarget();
+        return target;
+    }
+    public Vector3 HandleDash()
+    {
+        //quick dash forward, cooldown on aggro, next move
+        if (Time.fixedTime >= moveStamp)
+        {
+            dashStamp = Time.fixedTime + dashStamp;
+            //gotoRoam();
+            determineState();
+        }
+        return target;
+    }
+    public Vector3 HandleBumped()
+    {
+        // move in bump direction until time is up
+        if(Time.fixedTime >= moveStamp)
+        {
+            beingBumped = false;
+            determineState();
+        }
+        return target;
+    }
+
+    public void determineState() //see which state enemy should go in based on cooldowns and position/visability of other players
+    {
+        Debug.Log("determining state");
+        if(Time.time >= dashStamp)
+        {
+            checkClosestPlayer(); // find closest player, and if they are visable
+            if (seesPlayer)
+            {
+                closestTargetDir = (transform.position - closestTarget.transform.position);
+                if (closestTargetDistance <= agroLeashRange)
+                {
+                    goToAggro();
+                }
+                else
+                {
+                    gotoRoam();
+                }
+            }
+            else
+            {
+                //randomPathfind();
                 gotoRoam();
             }
         }
+        else
+        {
+            gotoRoam();
+        }
+        
     }
 
 
@@ -223,32 +239,34 @@ public class enemySwiper : MonoBehaviour
          Vector3 pDir = p.transform.position - transform.position;
          if (p != this.gameObject)
          {
-             if (p.GetComponent<collisionDetector>().isPlayer)
+             if (p.GetComponent<fallFromObstacles>().isPlayer)
              {
-                 if (closestTarget == null)
-                 {
-                     if (!Physics.Raycast(transform.position, pDir, out inf, pDir.magnitude, LayerMask.GetMask("wall", "big stuff")))
-                     {
-                         closestTarget = p;
-                         closestTargetDistance = Vector3.Distance(transform.position, p.transform.position);
-                         seesPlayer = true;
-                     }
+                    if(p.GetComponent<PlayerMovement>().isAlive)
+                    {
+                        if (closestTarget == null)
+                        {
+                            if (!Physics.Raycast(transform.position, pDir, out inf, pDir.magnitude, LayerMask.GetMask("wall", "big stuff")))
+                            {
+                                closestTarget = p;
+                                closestTargetDistance = Vector3.Distance(transform.position, p.transform.position);
+                                seesPlayer = true;
+                            }
 
-                 }
-                 else
-                 {
-                     if (Vector3.Distance(transform.position, p.transform.position) < closestTargetDistance)
-                     {
+                        }
+                        else
+                        {
+                            if (Vector3.Distance(transform.position, p.transform.position) < closestTargetDistance)
+                            {
 
-                         if (!Physics.Raycast(transform.position, pDir, out inf, pDir.magnitude, LayerMask.GetMask("wall", "big stuff")))
-                         {
-                             closestTarget = p;
-                             closestTargetDistance = Vector3.Distance(transform.position, p.transform.position);
-                             seesPlayer = true;
-                         }
-                     }
-                 }
-
+                                if (!Physics.Raycast(transform.position, pDir, out inf, pDir.magnitude, LayerMask.GetMask("wall", "big stuff")))
+                                {
+                                    closestTarget = p;
+                                    closestTargetDistance = Vector3.Distance(transform.position, p.transform.position);
+                                    seesPlayer = true;
+                                }
+                            }
+                        }
+                    }               
              }
              else
              {
@@ -282,7 +300,8 @@ public class enemySwiper : MonoBehaviour
 
  public void pathFind() // determines the best vector to move in
  {
-     checkClosestPlayer(); // find closest player
+        //Debug.Log("regular pathfind");
+     //checkClosestPlayer(); // find closest player
 
      // shoot rays in 16 directions
      // check which ones aren't obscured by obstacles
@@ -306,7 +325,6 @@ public class enemySwiper : MonoBehaviour
                     newDir = v;
                 }
             }
-
             else
             {
                 if (Vector3.Distance(transform.position, inf.transform.position) > minMoveDistance)
@@ -326,15 +344,14 @@ public class enemySwiper : MonoBehaviour
         }
         float targetRange = Random.Range(minTargetRange, maxTargetRange);
         target = transform.position + (newDir * targetRange);
-
-        targetCDStamp = Time.time + targetCD;
+       // targetCDStamp = Time.time + targetCD;
         hasTarget = true;
     }
 
 
     public void randomPathfind()
     {
-        //Debug.Log("so random");
+        //Debug.Log("randompathfind");
         Vector3 newDir = new Vector3(0, 0, 0);
         float biggestMove = 0;
         for (int i = 0; i < 16; i++)
@@ -358,9 +375,9 @@ public class enemySwiper : MonoBehaviour
 
             }
         }
-        float targetRange = Random.Range(minTargetRange, maxTargetRange);
+        float targetRange = Random.Range(minMove, biggestMove);
         target = transform.position + (newDir * targetRange);
-        targetCDStamp = Time.time + targetCD;
+        //targetCDStamp = Time.time + targetCD;
         hasTarget = true;
         Debug.DrawRay(this.transform.position, newDir * minMoveDistance, Color.yellow, 2f);
     }
@@ -421,7 +438,7 @@ public class enemySwiper : MonoBehaviour
         }
         float targetRange = Random.Range(minTargetRange, maxTargetRange);
         target = transform.position + (newDir * targetRange);
-        targetCDStamp = Time.time + targetCD;
+        //targetCDStamp = Time.time + targetCD;
         hasTarget = true;
         Debug.DrawRay(this.transform.position, newDir * minMoveDistance, Color.yellow, 2f);
 
@@ -438,7 +455,7 @@ public class enemySwiper : MonoBehaviour
     {
 
         curTargetDir = (myDir - this.transform.position).normalized;
-        Debug.Log("cur target dir: " + curTargetDir);
+        //Debug.Log("cur target dir: " + curTargetDir);
         curTargetDir = curTargetDir * curMoveSpeed;
         
         if (!beingBumped)
@@ -447,7 +464,7 @@ public class enemySwiper : MonoBehaviour
             if (isDashing)
             {
                 Debug.DrawLine(this.transform.position, curTargetDir * dashRange, Color.cyan, 2f);
-                agroCDStamp = Time.time + agroCD;
+                //agroCDStamp = Time.time + agroCD;
                 dashStamp = Time.time + dashTime;
                 isAgro = false;
                 isDashing = false;
@@ -455,6 +472,7 @@ public class enemySwiper : MonoBehaviour
         }
         else
         {
+            Debug.Log("I am bumped");
             rb.MovePosition(transform.position + curTargetDir * Time.fixedDeltaTime);     
         }
     }
@@ -462,10 +480,10 @@ public class enemySwiper : MonoBehaviour
     public void becomeAgro(GameObject other)
     {
         isAgro = true;
-        agroTimerStamp = Time.time + agroTime;
+       // agroTimerStamp = Time.time + agroTime;
         targetEnemy = other.gameObject;
-        slowCDStamp = Time.time + slowCDTime;
-        isSlow = false;
+       // slowCDStamp = Time.time + slowCDTime;
+        //isSlow = false;
     }
     public void findOthers()
     {
@@ -473,30 +491,39 @@ public class enemySwiper : MonoBehaviour
 
     }
 
-    public void newMoveSpeed(bool agro)
+    public void newMoveSpeed(int state)
     {
-        if (agro)
+        if (state == 1) // roam
+        {
+            curMoveSpeed = Random.Range(minMove, maxMove);
+        }
+        if (state == 2) //aggro/chase
         {
             curMoveSpeed = Random.Range(agroMinMove, agroMaxMove);
         }
-        else
+        if (state == 3) //dash forward
         {
-            curMoveSpeed = Random.Range(minMove, maxMove);
+            curMoveSpeed = dashForce;
+        }
+        if (state == 4) //be bumped by something else
+        {
+            curMoveSpeed = bumpForce;
         }
     }
 
     public void getBumped(Vector3 newDir, float bumpForce)
     {
+        goToBumped();
         target = newDir * bumpForce;
         curMoveSpeed = bumpForce;
         beingBumped = true;
-        bumpStamp = Time.time + bumpTime;
+       // bumpStamp = Time.time + bumpTime;
     }
 
     public void doDash()
     {   
         isDashing = true;
-        isSlow = false;
+        //isSlow = false;
         curMoveSpeed = dashForce;
     }
 }

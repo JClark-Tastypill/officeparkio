@@ -51,9 +51,11 @@ public class fallFromObstacles : MonoBehaviour
                 {
                     //Debug.Log(GetComponent<PlayerMovement>().)
                     //if high enough speed, do bump
-                    if(GetComponent<PlayerMovement>().lastPlayerInput.magnitude > collision.gameObject.GetComponent<enemySwiper>().curMoveSpeed)
+                    if(GetComponent<PlayerMovement>().lastPlayerInput.magnitude > collision.gameObject.GetComponent<enemySwiper>().curMoveSpeed && !GetComponent<PlayerMovement>().beingBumped)
                     {
+                        Debug.Log("player speed: " + GetComponent<PlayerMovement>().lastPlayerInput.magnitude + ", enemy speed: " + collision.gameObject.GetComponent<enemySwiper>().curMoveSpeed);
                         doBump(collision);
+
                     }
                     
                     //Debug.DrawRay(this.transform.position, collision.relativeVelocity * 500f, Color.red, 5f);
@@ -68,7 +70,7 @@ public class fallFromObstacles : MonoBehaviour
                     if (GetComponent<PlayerMovement>().lastPlayerInput.magnitude >= fallOffVel && GetComponent<PlayerMovement>().beingBumped)// && GetComponent<swipeToMove>().isAlive)
                     {
                         //newCalculateProbability(collision);
-                        //startDeath();
+                        startDeath();
                     }
                 }
 
@@ -80,14 +82,16 @@ public class fallFromObstacles : MonoBehaviour
                     //if high enough speed, do bump
                     if(collision.gameObject.GetComponent<fallFromObstacles>().isPlayer)
                     {
-                        if (GetComponent<enemySwiper>().curMoveSpeed > collision.gameObject.GetComponent<PlayerMovement>().lastPlayerInput.magnitude)
+                        if (GetComponent<enemySwiper>().curMoveSpeed > collision.gameObject.GetComponent<PlayerMovement>().lastPlayerInput.magnitude && !GetComponent<enemySwiper>().beingBumped)
                         {
+                            Debug.Log("enemy speed: " + GetComponent<enemySwiper>().curMoveSpeed + ", player speed: " + collision.gameObject.GetComponent<PlayerMovement>().lastPlayerInput.magnitude);
                             doBump(collision);
+                            
                         }
                     }
                     else
                     {
-                        if (GetComponent<enemySwiper>().curMoveSpeed > collision.gameObject.GetComponent<enemySwiper>().curMoveSpeed)
+                        if (GetComponent<enemySwiper>().curMoveSpeed > collision.gameObject.GetComponent<enemySwiper>().curMoveSpeed && !GetComponent<enemySwiper>().beingBumped)
                         {
                             doBump(collision);
                         }
@@ -105,7 +109,7 @@ public class fallFromObstacles : MonoBehaviour
                     }
                     else
                     {
-                        GetComponent<enemySwiper>().randomPathfind();
+                        GetComponent<enemySwiper>().determineState();
                     }
                 }
             }
@@ -143,7 +147,7 @@ public class fallFromObstacles : MonoBehaviour
 
         if (isPlayer)
         {
-            GetComponent<swipeToMove>().isAlive = false;
+            GetComponent<PlayerMovement>().isAlive = false;
             myHuman.GetComponent<ragdollController>().startPlayerRagdoll();
         }
         else

@@ -6,9 +6,9 @@ using UnityEngine;
 public class PlayerMovement : MonoBehaviour
 {
     public Rigidbody rb;
-
+    public bool isAlive = true;
     public DebugFloat maxDragDistance = 175f;
-    public DebugFloat maxSpeed = 40f, accelerationSpeed = 225f, decelerationSpeed = 30f, rotationSpeed = 10f, dashForce = 80f, dashSwipeLength = 225f, kickCD = .25f;
+    public DebugFloat maxSpeed = 40f, accelerationSpeed = 450f, decelerationSpeed = 30f, rotationSpeed = 10f, dashForce = 140f, dashSwipeLength = 225f, kickCD = .06f, kickTime = .15f;
     //public DebugFloat activeDecelerationRate
 
     private Vector2 tapStartPosition;
@@ -20,33 +20,32 @@ public class PlayerMovement : MonoBehaviour
     public DebugFloat swipeTouchTime = .2f;
 
     public bool canKick = true;
+    public bool isKicking = true;
     private float kickCDStamp;
     public bool beingBumped;
     public float bumpTime, bumpStamp;
-    public DebugFloat maxDashSwipeLength = 300, minDashForce = 20f, sameTouchSwipeDist = 175;
+    public DebugFloat maxDashSwipeLength = 50, minDashForce = 20f, sameTouchSwipeDist = 175;
 
     private void Start()
     {
         rb = GetComponent<Rigidbody>();
-        /*  DebugMenu.instance.CreateDebugSlider("Max Drag Dist", Color.black, maxDragDistance, 400, 0);
+        /*  
           DebugMenu.instance.CreateDebugSlider("Max Speed", Color.black, maxSpeed, 80, 1);
-          DebugMenu.instance.CreateDebugSlider("Acceleration Speed", Color.black, accelerationSpeed, 300, 1);
-          DebugMenu.instance.CreateDebugSlider("Deceleration Speed", Color.black, decelerationSpeed, 100, 1);
+          
           DebugMenu.instance.CreateDebugSlider("Rotation Speed", Color.black, rotationSpeed, 10, 0);
           DebugMenu.instance.CreateDebugSlider("max dash Swipe Length", Color.black, maxDashSwipeLength, 500, 200);
           DebugMenu.instance.CreateDebugSlider("min dash Force", Color.black, minDashForce, 200, 0);
           DebugMenu.instance.CreateDebugSlider("dash swipe length", Color.black, dashSwipeLength, 300, 1);
-          DebugMenu.instance.CreateDebugSlider("dash cooldown", Color.black, kickCD, 1, 0);
           DebugMenu.instance.CreateDebugSlider("swipe time", Color.black, swipeTouchTime, 1, 0);
-          DebugMenu.instance.CreateDebugSlider("same touch swipe length", Color.black, swipeTouchTime, 400, 100);
-          DebugMenu.instance.CreateDebugSlider("dash force", Color.black, dashForce, 150, 1);*/
-        DebugMenu.instance.CreateDebugSlider("big dash force", Color.black, dashForce, 150, 1);
-        DebugMenu.instance.CreateDebugSlider("small dash force", Color.black, minDashForce, 150, 1);
-        DebugMenu.instance.CreateDebugSlider("swipe time", Color.black, swipeTouchTime, 1, 0);
-        DebugMenu.instance.CreateDebugSlider("max dash Swipe Length", Color.black, maxDashSwipeLength, 300, 1);
-        DebugMenu.instance.CreateDebugSlider("min swipe length needed", Color.black, dashSwipeLength, 300, 1);
+          DebugMenu.instance.CreateDebugSlider("same touch swipe length", Color.black, swipeTouchTime, 400, 100);*/
+        DebugMenu.instance.CreateDebugSlider("dash force", Color.black, dashForce, 200, 1);
+        DebugMenu.instance.CreateDebugSlider("dash Swipe Length", Color.black, maxDashSwipeLength, 300, 1);
         DebugMenu.instance.CreateDebugSlider("dash cooldown", Color.black, kickCD, 1, 0);
         DebugMenu.instance.CreateDebugSlider("Deceleration Speed", Color.black, decelerationSpeed, 100, 1);
+        DebugMenu.instance.CreateDebugSlider("Max Drag Dist", Color.black, maxDragDistance, 400, 0);
+        DebugMenu.instance.CreateDebugSlider("Acceleration Speed", Color.black, accelerationSpeed, 500, 1);
+        DebugMenu.instance.CreateDebugSlider("how long dash lasts", Color.black, kickTime, .5f, 0);
+        //DebugMenu.instance.CreateDebugSlider("same touch swipe mag", Color.black, sameTouchSwipeDist, 300, 100);
     }
 
 
@@ -77,8 +76,6 @@ public class PlayerMovement : MonoBehaviour
             if (Input.GetTouch(0).phase == TouchPhase.Began)
             {
                 tapStartPosition = Input.GetTouch(0).position;
-                touchStartTime = Time.fixedTime;
-
             }
 
             Vector2 currentTapLocation = Input.GetTouch(0).position;
@@ -88,41 +85,24 @@ public class PlayerMovement : MonoBehaviour
             {
                 tapStartPosition = currentTapLocation - inputDiff.normalized * maxDragDistance; //change the new "start" touch location for more accurate measurements
                 inputDiff = currentTapLocation - tapStartPosition;
-                touchStartTime = Time.fixedTime;
-
             }
-            //Debug.Log(inputDiff.magnitude);
-            if (inputDiff.magnitude >= sameTouchSwipeDist)
+
+            //check to see if a big swipe was made without letting go of screen //////////////
+            float bigSwipeMag = Input.GetTouch(0).deltaPosition.magnitude;
+            //Debug.Log("swipe magnitude: " + bigSwipeMag + ", max swipe: " + sameTouchSwipeDist);
+            if (bigSwipeMag >= sameTouchSwipeDist && canKick)
             {
-                if (canKick)
-                {
-                    //doPlainKick(new Vector3(inputDiff.x, 0, inputDiff.y).normalized);
-                    //tapStartPosition = currentTapLocation;
-                }
+                //doKick(new Vector3(inputDiff.x, 0, inputDiff.y));
             }
-
 
             // check to see if player swipes to do a big kick in that direction//////////////////
             if (Input.GetTouch(0).phase == TouchPhase.Ended) // touch end
             {
-                touchEndTime = Time.fixedTime;
-                Debug.Log("touch time: " + (touchEndTime - touchStartTime));
-                if (canKick && (touchEndTime - touchStartTime <= swipeTouchTime))
+                float swipeMag = Input.GetTouch(0).deltaPosition.magnitude;
+                if (swipeMag >= maxDashSwipeLength && canKick)
                 {
-                    //Debug.Log("inputdiff: " + inputDiff.magnitude);
-                    if (inputDiff.magnitude >= dashSwipeLength)
-                    {
-                        //doPlainKick(new Vector3(inputDiff.x, 0, inputDiff.y).normalized);
-                        doKick(new Vector3(inputDiff.x, 0, inputDiff.y));
-                    }
-                    //Debug.Log("input dif: " + inputDiff);
-                    /* if(touchEndTime - touchStartTime <= swipeTouchTime)
-                     {
-
-                         doKick(new Vector3(inputDiff.x, 0, inputDiff.y));
-                        }   */
-                                   
-                }                
+                    doKick(new Vector3(inputDiff.x, 0, inputDiff.y));
+                }
             }
 
 
@@ -156,68 +136,23 @@ public class PlayerMovement : MonoBehaviour
         }
 
         // move player every frame some amount
-        rb.MovePosition(transform.position + lastPlayerInput * Time.fixedDeltaTime);
-
-        if (lastPlayerInput.magnitude > 0.1f)
+        if(isAlive)
         {
-            Quaternion newLook = Quaternion.LookRotation(lastPlayerInput);
-            rb.MoveRotation(Quaternion.Lerp(transform.rotation, newLook, rotationSpeed * Time.deltaTime));
-        }
-    }
+            rb.MovePosition(transform.position + lastPlayerInput * Time.fixedDeltaTime);
 
-    public void doPlainKick(Vector3 newDir)
-    {
-        lastPlayerInput = newDir.normalized * dashForce;
-        //Debug.Log("dash force: " + lastPlayerInput.magnitude);
-        kickCDStamp = Time.fixedTime + kickCD;
-        Quaternion newLook = Quaternion.LookRotation(newDir);
-        rb.MoveRotation(Quaternion.Lerp(transform.rotation, newLook, rotationSpeed * Time.deltaTime));
-        canKick = false;
+            if (lastPlayerInput.magnitude > 0.1f)
+            {
+                Quaternion newLook = Quaternion.LookRotation(lastPlayerInput);
+                rb.MoveRotation(Quaternion.Lerp(transform.rotation, newLook, rotationSpeed * Time.deltaTime));
+            }
+        }
+        
     }
 
     public void doKick(Vector3 newDir)
     {
-        Debug.Log("new dir before change: " + newDir.magnitude);
-        //float maxDirVel = 300;
-        //float minDirVel = 150;
-        if(newDir.magnitude < maxDashSwipeLength)
-        {
-            Debug.Log("small dash");
-            newDir = newDir.normalized * minDashForce;
-        }
-        else
-        {
-            Debug.Log("big dash");
-            newDir = newDir.normalized * dashForce;
-        }
-        /*float t = Mathf.Clamp(newDir.magnitude, dashSwipeLength, maxDashSwipeLength);
-        newDir = newDir.normalized * (t / maxDashSwipeLength);
-        Debug.Log("new dir after change: " + newDir.magnitude);
-        newDir *= minDashForce;
-        */
+        newDir = newDir.normalized * dashForce;
 
-        /*if(newDir.magnitude >= maxDirVel)
-        {
-            newDir = newDir.normalized * maxDashForce;
-            Debug.Log("new dir: " + newDir.magnitude);
-        }
-        if(newDir.magnitude < maxDirVel && newDir.magnitude > minDirVel)
-        {
-            float t = newDir.magnitude / (maxDirVel - minDirVel);
-            newDir = newDir.normalized * (maxDashForce * t);
-            Debug.Log("new dir: " + newDir.magnitude);
-        }
-        if(newDir.magnitude <= minDirVel)
-        {
-            newDir = newDir.normalized * maxDashForce;
-            Debug.Log("new dir: " + newDir.magnitude);
-        }*/
-
-        //float t = newDir.magnitude / maxDashForce; //percentage of max speed
-        //float targetMoveSpeed = Mathf.Lerp(0f, maxDashForce, t); // target speed is based on the above percentage and maxspeed
-        //Debug.Log("t: " + t);
-        //dashForce = targetMoveSpeed;
-        //Debug.Log("dash force:" + dashForce);
         lastPlayerInput = newDir;//.normalized * dashForce;
         Debug.Log("dash force: " + lastPlayerInput.magnitude);
         kickCDStamp = Time.fixedTime + kickCD;
@@ -228,6 +163,7 @@ public class PlayerMovement : MonoBehaviour
 
     public void getBumped(Vector3 newDir, float bumpForce)
     {
+        Debug.Log("player bumped");
         lastPlayerInput = newDir * bumpForce;
         beingBumped = true;
         bumpStamp = Time.time + bumpTime;

@@ -33,7 +33,7 @@ public class enemySwiper : MonoBehaviour
     public float dashRange;
     public bool isDashing = true;
     public float dashForce;
-    public float bumpForce;
+    private float bumpForce;
     
     public enum EnemyState
     {
@@ -121,7 +121,7 @@ public class enemySwiper : MonoBehaviour
         pathFind();
         newMoveSpeed(3);
         moveStamp = Time.time + dashTime;
-        
+        isDashing = true;
         currentState = EnemyState.Dash;
     }
 
@@ -178,7 +178,8 @@ public class enemySwiper : MonoBehaviour
         //quick dash forward, cooldown on aggro, next move
         if (Time.fixedTime >= moveStamp)
         {
-            dashStamp = Time.fixedTime + dashStamp;
+            dashStamp = Time.fixedTime + dashTime;
+            isDashing = false;
             //gotoRoam();
             determineState();
         }
@@ -464,9 +465,9 @@ public class enemySwiper : MonoBehaviour
             {
                 Debug.DrawLine(this.transform.position, curTargetDir * dashRange, Color.cyan, 2f);
                 //agroCDStamp = Time.time + agroCD;
-                dashStamp = Time.time + dashTime;
-                isAgro = false;
-                isDashing = false;
+                //dashStamp = Time.time + dashTime;
+                //isAgro = false;
+                //isDashing = false;
             }
         }
         else
@@ -506,15 +507,17 @@ public class enemySwiper : MonoBehaviour
         }
         if (state == 4) //be bumped by something else
         {
+            Debug.Log("using this");
             curMoveSpeed = bumpForce;
         }
     }
 
-    public void getBumped(Vector3 newDir, float bumpForce)
+    public void getBumped(Vector3 newDir, float bForce)
     {
         goToBumped();
-        target = newDir * bumpForce;
-        curMoveSpeed = bumpForce;
+        bumpForce = bForce;
+        target = newDir * bForce;
+        curMoveSpeed = bForce;        
         beingBumped = true;
        // bumpStamp = Time.time + bumpTime;
     }

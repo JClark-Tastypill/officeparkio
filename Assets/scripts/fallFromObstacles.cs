@@ -44,9 +44,9 @@ public class fallFromObstacles : MonoBehaviour
         //Debug.Log(collision.gameObject.tag);
         if (!onColCD)
         {
-            if (isPlayer)
+            if (isPlayer) // player logic
             {                
-                if (collision.gameObject.tag == "Player" && !GetComponent<PlayerMovement>().beingBumped) //when colliding with other players, bump both of them 
+                if (collision.gameObject.tag == "Player") //when colliding with other players, bump both of them 
                 {
                     if (!GetComponent<PlayerMovement>().canKick && !collision.gameObject.GetComponent<enemySwiper>().isDashing)
                     {
@@ -73,54 +73,46 @@ public class fallFromObstacles : MonoBehaviour
                 }
             }
 
-            else
+            else //enemy logic
             {
-                if(!GetComponent<enemySwiper>().beingBumped)
+                if (collision.gameObject.tag == "Player") //when colliding with other players, bump both of them 
                 {
-                    if (collision.gameObject.tag == "Player") //when colliding with other players, bump both of them 
+                    if (collision.gameObject.GetComponent<fallFromObstacles>().isPlayer)
                     {
-                        //if high enough speed, do bump
-                        if (collision.gameObject.GetComponent<fallFromObstacles>().isPlayer)
-                        {
-                            if (GetComponent<enemySwiper>().isDashing && !collision.gameObject.GetComponent<enemySwiper>().isDashing)
-                            {
-                                //Debug.Log("big bump should happen");
-                                enemyDoBump(collision, 1);
-                            }
-                            if (GetComponent<enemySwiper>().isDashing && collision.gameObject.GetComponent<enemySwiper>().isDashing)
-                            {
-                                //Debug.Log("medium bump should happen");
-                                enemyDoBump(collision, 2);
-                            }
-                            if (!GetComponent<enemySwiper>().isDashing && !collision.gameObject.GetComponent<enemySwiper>().isDashing)
-                            {
-                                //Debug.Log("small bump should happen");
-                                enemyDoBump(collision, 3);
-                            }
+                        if (GetComponent<enemySwiper>().isDashing && collision.gameObject.GetComponent<PlayerMovement>().canKick)
+                        { 
+                            //Debug.Log("big bump should happen");
+                            enemyDoBump(collision, 1);
                         }
-                        else
+                        if (GetComponent<enemySwiper>().isDashing && !collision.gameObject.GetComponent<PlayerMovement>().canKick)
                         {
-                            if (GetComponent<enemySwiper>().isDashing && !collision.gameObject.GetComponent<enemySwiper>().isDashing)
-                            {
-                                //Debug.Log("big bump should happen");
-                                enemyDoBump(collision, 1);
-                            }
-                            if (GetComponent<enemySwiper>().isDashing && collision.gameObject.GetComponent<enemySwiper>().isDashing)
-                            {
-                                //Debug.Log("medium bump should happen");
-                                enemyDoBump(collision, 2);
-                            }
-                            if (!GetComponent<enemySwiper>().isDashing && !collision.gameObject.GetComponent<enemySwiper>().isDashing)
-                            {
-                                //Debug.Log("small bump should happen");
-                                enemyDoBump(collision, 3);
-                            }
+                            //Debug.Log("medium bump should happen");
+                            enemyDoBump(collision, 2);
+                        }
+                        if (!GetComponent<enemySwiper>().isDashing && collision.gameObject.GetComponent<PlayerMovement>().canKick)
+                        {
+                            //Debug.Log("small bump should happen");
+                            enemyDoBump(collision, 3);
                         }
                     }
-                
-                    
-                    //Debug.DrawRay(this.transform.position, collision.relativeVelocity * 50f, Color.white, 5f);
-                    //Debug.DrawRay(this.transform.position, collision.impulse * 50f, Color.black, 5f);
+                    else
+                    {
+                        if (GetComponent<enemySwiper>().isDashing && !collision.gameObject.GetComponent<enemySwiper>().isDashing)
+                        {
+                            //Debug.Log("big bump should happen");
+                            enemyDoBump(collision, 1);
+                        }
+                        if (GetComponent<enemySwiper>().isDashing && collision.gameObject.GetComponent<enemySwiper>().isDashing)
+                        {
+                            //Debug.Log("medium bump should happen");
+                            enemyDoBump(collision, 2);
+                        }
+                        if (!GetComponent<enemySwiper>().isDashing && !collision.gameObject.GetComponent<enemySwiper>().isDashing)
+                        {
+                            //Debug.Log("small bump should happen");
+                            enemyDoBump(collision, 3);
+                        }
+                    }
                 }
                 if (collision.gameObject.tag == "obstacle") //when obstacles, see if they can fall off
                 {
@@ -212,7 +204,7 @@ public class fallFromObstacles : MonoBehaviour
 
     public void enemyDoBump(Collision c, int bumpType)
     {
-        Debug.Log("enemy do a bump");
+        Debug.Log("enemy do a bump " + bumpType);
         ContactPoint contact = c.GetContact(0);
         Vector3 newDir = new Vector3(contact.point.x - transform.position.x, 0, contact.point.z - transform.position.z);
         newDir = newDir.normalized;

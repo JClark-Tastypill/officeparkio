@@ -4204,7 +4204,9 @@ MonoBehaviour:
   colCDTimestamp: 0
   bumpCD: 0
   bumpCDStamp: 0
-  bumpForce: 50
+  bigBumpForce: 60
+  mediumBumpForce: 20
+  smallBumpForce: 5
   isBumped: 0
 --- !u!4 &490653092 stripped
 Transform:
@@ -8167,13 +8169,17 @@ MonoBehaviour:
   isAlive: 0
   isAgro: 0
   hasTarget: 0
-  moveCDMin: 0
-  moveCDMax: 0
-  moveCDStamp: 0
-  agroCDMin: 0
-  agroCDMax: 0
+  roamTime: 0
+  agroTime: 0
+  bumpTime: 0
+  dashTime: 0
+  dashCDTime: 0
+  moveStamp: 0
+  dashStamp: 0
+  canDash: 0
   target: {x: 0, y: 0, z: 0}
   targetEnemy: {fileID: 0}
+  reachTargetRange: 0
   minTargetRange: 0
   maxTargetRange: 0
   minMove: 0
@@ -8183,13 +8189,7 @@ MonoBehaviour:
   agroMaxMove: 0
   rb: {fileID: 0}
   agroLeashRange: 0
-  agroTime: 0
-  agroCD: 0
-  agroTimerStamp: 0
-  agroCDStamp: 0
   rotationSpeed: 0
-  targetCD: 0
-  targetCDStamp: 0
   otherPlayers: []
   closestTarget: {fileID: 0}
   closestTargetDistance: 0
@@ -8197,22 +8197,14 @@ MonoBehaviour:
   rayLength: 0
   bestAngleDist: 0
   minMoveDistance: 0
-  isSlow: 0
-  chanceSlow: 0
-  slowCDTime: 0
-  slowCDStamp: 0
-  slowTime: 0
-  slowTimeStamp: 0
+  seesPlayer: 0
   curMoveSpeed: 0
   curTargetDir: {x: 0, y: 0, z: 0}
   beingBumped: 0
-  bumpTime: 0
-  bumpStamp: 0
   dashRange: 0
   isDashing: 1
   dashForce: 0
-  dashTime: 0
-  dashStamp: 0
+  bumpForce: 0
 --- !u!1 &892298745 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 1532792802756676, guid: ac192b529e48339409526fbd8ef6361b,
@@ -8377,7 +8369,9 @@ MonoBehaviour:
   colCDTimestamp: 0
   bumpCD: 0
   bumpCDStamp: 0
-  bumpForce: 50
+  bigBumpForce: 60
+  mediumBumpForce: 20
+  smallBumpForce: 5
   isBumped: 0
 --- !u!1001 &949712985
 PrefabInstance:
@@ -11519,7 +11513,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 452089541, guid: ae39200c020c64ff8bd4b89840023683, type: 3}
       propertyPath: dashForce
-      value: 50
+      value: 60
       objectReference: {fileID: 0}
     - target: {fileID: 452089541, guid: ae39200c020c64ff8bd4b89840023683, type: 3}
       propertyPath: dashRange
@@ -11527,11 +11521,27 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 452089541, guid: ae39200c020c64ff8bd4b89840023683, type: 3}
       propertyPath: dashTime
-      value: 1
+      value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 452089541, guid: ae39200c020c64ff8bd4b89840023683, type: 3}
       propertyPath: isDashing
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 452089541, guid: ae39200c020c64ff8bd4b89840023683, type: 3}
+      propertyPath: roamTime
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 452089541, guid: ae39200c020c64ff8bd4b89840023683, type: 3}
+      propertyPath: dashCDTime
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 452089541, guid: ae39200c020c64ff8bd4b89840023683, type: 3}
+      propertyPath: reachTargetRange
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 452089541, guid: ae39200c020c64ff8bd4b89840023683, type: 3}
+      propertyPath: bumpForce
+      value: 65
       objectReference: {fileID: 0}
     - target: {fileID: 2672166801190889352, guid: ae39200c020c64ff8bd4b89840023683,
         type: 3}
@@ -11606,7 +11616,7 @@ PrefabInstance:
     - target: {fileID: 2672166801190889398, guid: ae39200c020c64ff8bd4b89840023683,
         type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2672166801190889399, guid: ae39200c020c64ff8bd4b89840023683,
         type: 3}
@@ -11838,7 +11848,8 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 2672166801190889407, guid: ae39200c020c64ff8bd4b89840023683, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: ae39200c020c64ff8bd4b89840023683, type: 3}
 --- !u!1001 &1244256915
 PrefabInstance:
@@ -13119,7 +13130,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 452089541, guid: ae39200c020c64ff8bd4b89840023683, type: 3}
       propertyPath: dashForce
-      value: 50
+      value: 60
       objectReference: {fileID: 0}
     - target: {fileID: 452089541, guid: ae39200c020c64ff8bd4b89840023683, type: 3}
       propertyPath: dashRange
@@ -13127,11 +13138,27 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 452089541, guid: ae39200c020c64ff8bd4b89840023683, type: 3}
       propertyPath: dashTime
-      value: 1
+      value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 452089541, guid: ae39200c020c64ff8bd4b89840023683, type: 3}
       propertyPath: isDashing
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 452089541, guid: ae39200c020c64ff8bd4b89840023683, type: 3}
+      propertyPath: roamTime
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 452089541, guid: ae39200c020c64ff8bd4b89840023683, type: 3}
+      propertyPath: dashCDTime
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 452089541, guid: ae39200c020c64ff8bd4b89840023683, type: 3}
+      propertyPath: reachTargetRange
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 452089541, guid: ae39200c020c64ff8bd4b89840023683, type: 3}
+      propertyPath: bumpForce
+      value: 65
       objectReference: {fileID: 0}
     - target: {fileID: 2672166801190889352, guid: ae39200c020c64ff8bd4b89840023683,
         type: 3}
@@ -13206,7 +13233,7 @@ PrefabInstance:
     - target: {fileID: 2672166801190889398, guid: ae39200c020c64ff8bd4b89840023683,
         type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2672166801190889399, guid: ae39200c020c64ff8bd4b89840023683,
         type: 3}
@@ -13458,7 +13485,8 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 1
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 2672166801190889407, guid: ae39200c020c64ff8bd4b89840023683, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: ae39200c020c64ff8bd4b89840023683, type: 3}
 --- !u!1001 &1351840462
 PrefabInstance:
@@ -19691,7 +19719,9 @@ MonoBehaviour:
   colCDTimestamp: 0
   bumpCD: 0
   bumpCDStamp: 0
-  bumpForce: 50
+  bigBumpForce: 60
+  mediumBumpForce: 20
+  smallBumpForce: 5
   isBumped: 0
 --- !u!1001 &2105350992
 PrefabInstance:
@@ -20563,7 +20593,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 452089541, guid: ae39200c020c64ff8bd4b89840023683, type: 3}
       propertyPath: dashForce
-      value: 50
+      value: 60
       objectReference: {fileID: 0}
     - target: {fileID: 452089541, guid: ae39200c020c64ff8bd4b89840023683, type: 3}
       propertyPath: dashRange
@@ -20571,11 +20601,27 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 452089541, guid: ae39200c020c64ff8bd4b89840023683, type: 3}
       propertyPath: dashTime
-      value: 1
+      value: 0.5
       objectReference: {fileID: 0}
     - target: {fileID: 452089541, guid: ae39200c020c64ff8bd4b89840023683, type: 3}
       propertyPath: isDashing
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 452089541, guid: ae39200c020c64ff8bd4b89840023683, type: 3}
+      propertyPath: roamTime
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 452089541, guid: ae39200c020c64ff8bd4b89840023683, type: 3}
+      propertyPath: reachTargetRange
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 452089541, guid: ae39200c020c64ff8bd4b89840023683, type: 3}
+      propertyPath: dashCDTime
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 452089541, guid: ae39200c020c64ff8bd4b89840023683, type: 3}
+      propertyPath: bumpForce
+      value: 65
       objectReference: {fileID: 0}
     - target: {fileID: 2672166801190889352, guid: ae39200c020c64ff8bd4b89840023683,
         type: 3}
@@ -20590,7 +20636,7 @@ PrefabInstance:
     - target: {fileID: 2672166801190889354, guid: ae39200c020c64ff8bd4b89840023683,
         type: 3}
       propertyPath: m_LocalPosition.x
-      value: 2.4
+      value: 0.4
       objectReference: {fileID: 0}
     - target: {fileID: 2672166801190889354, guid: ae39200c020c64ff8bd4b89840023683,
         type: 3}
@@ -20600,7 +20646,7 @@ PrefabInstance:
     - target: {fileID: 2672166801190889354, guid: ae39200c020c64ff8bd4b89840023683,
         type: 3}
       propertyPath: m_LocalPosition.z
-      value: 75.7
+      value: 35.4
       objectReference: {fileID: 0}
     - target: {fileID: 2672166801190889354, guid: ae39200c020c64ff8bd4b89840023683,
         type: 3}
@@ -20650,7 +20696,7 @@ PrefabInstance:
     - target: {fileID: 2672166801190889398, guid: ae39200c020c64ff8bd4b89840023683,
         type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2672166801190889407, guid: ae39200c020c64ff8bd4b89840023683,
         type: 3}
@@ -20690,7 +20736,7 @@ PrefabInstance:
     - target: {fileID: 7087333241940273129, guid: ae39200c020c64ff8bd4b89840023683,
         type: 3}
       propertyPath: m_ConnectedAnchor.z
-      value: -0.0000000144355
+      value: -0.0000000023283064
       objectReference: {fileID: 0}
     - target: {fileID: 7087333241948975079, guid: ae39200c020c64ff8bd4b89840023683,
         type: 3}
@@ -20720,27 +20766,27 @@ PrefabInstance:
     - target: {fileID: 7087333242164613911, guid: ae39200c020c64ff8bd4b89840023683,
         type: 3}
       propertyPath: m_ConnectedAnchor.z
-      value: 0.00000029802322
+      value: -0.00000020861626
       objectReference: {fileID: 0}
     - target: {fileID: 7087333242164613911, guid: ae39200c020c64ff8bd4b89840023683,
         type: 3}
       propertyPath: m_ConnectedAnchor.y
-      value: 0.000000052154064
+      value: 0.000000044703484
       objectReference: {fileID: 0}
     - target: {fileID: 7087333242194630845, guid: ae39200c020c64ff8bd4b89840023683,
         type: 3}
       propertyPath: m_ConnectedAnchor.x
-      value: 0.33947498
+      value: 0.339475
       objectReference: {fileID: 0}
     - target: {fileID: 7087333242194630845, guid: ae39200c020c64ff8bd4b89840023683,
         type: 3}
       propertyPath: m_ConnectedAnchor.y
-      value: 0.0014474988
+      value: 0.0014475272
       objectReference: {fileID: 0}
     - target: {fileID: 7087333242194630845, guid: ae39200c020c64ff8bd4b89840023683,
         type: 3}
       propertyPath: m_ConnectedAnchor.z
-      value: 0.0014367551
+      value: 0.0014362112
       objectReference: {fileID: 0}
     - target: {fileID: 7087333242287441676, guid: ae39200c020c64ff8bd4b89840023683,
         type: 3}
@@ -20800,17 +20846,17 @@ PrefabInstance:
     - target: {fileID: 7087333243158599605, guid: ae39200c020c64ff8bd4b89840023683,
         type: 3}
       propertyPath: m_ConnectedAnchor.z
-      value: -0.098967075
+      value: -0.09896709
       objectReference: {fileID: 0}
     - target: {fileID: 7087333243238816435, guid: ae39200c020c64ff8bd4b89840023683,
         type: 3}
       propertyPath: m_ConnectedAnchor.z
-      value: -0.016227446
+      value: -0.016227439
       objectReference: {fileID: 0}
     - target: {fileID: 7087333243238816435, guid: ae39200c020c64ff8bd4b89840023683,
         type: 3}
       propertyPath: m_ConnectedAnchor.y
-      value: -0.09750737
+      value: -0.09750738
       objectReference: {fileID: 0}
     - target: {fileID: 7087333243238816435, guid: ae39200c020c64ff8bd4b89840023683,
         type: 3}
@@ -20820,7 +20866,7 @@ PrefabInstance:
     - target: {fileID: 7087333243287240078, guid: ae39200c020c64ff8bd4b89840023683,
         type: 3}
       propertyPath: m_ConnectedAnchor.z
-      value: 0.09896713
+      value: 0.09896715
       objectReference: {fileID: 0}
     - target: {fileID: 7087333243287240078, guid: ae39200c020c64ff8bd4b89840023683,
         type: 3}
@@ -20835,54 +20881,55 @@ PrefabInstance:
     - target: {fileID: 7087333243707449126, guid: ae39200c020c64ff8bd4b89840023683,
         type: 3}
       propertyPath: m_ConnectedAnchor.x
-      value: -0.40415394
+      value: -0.40415382
       objectReference: {fileID: 0}
     - target: {fileID: 7087333243707449126, guid: ae39200c020c64ff8bd4b89840023683,
         type: 3}
       propertyPath: m_ConnectedAnchor.y
-      value: 0.061365545
+      value: 0.061366085
       objectReference: {fileID: 0}
     - target: {fileID: 7087333243707449126, guid: ae39200c020c64ff8bd4b89840023683,
         type: 3}
       propertyPath: m_ConnectedAnchor.z
-      value: -0.000000009778885
+      value: 9.313245e-10
       objectReference: {fileID: 0}
     - target: {fileID: 7087333243752698115, guid: ae39200c020c64ff8bd4b89840023683,
         type: 3}
       propertyPath: m_ConnectedAnchor.x
-      value: 0.27114525
+      value: 0.27114522
       objectReference: {fileID: 0}
     - target: {fileID: 7087333243752698115, guid: ae39200c020c64ff8bd4b89840023683,
         type: 3}
       propertyPath: m_ConnectedAnchor.y
-      value: -0.000000018109859
+      value: -0.000000021842425
       objectReference: {fileID: 0}
     - target: {fileID: 7087333243752698115, guid: ae39200c020c64ff8bd4b89840023683,
         type: 3}
       propertyPath: m_ConnectedAnchor.z
-      value: 0.00038168536
+      value: 0.0003812602
       objectReference: {fileID: 0}
     - target: {fileID: 7087333243876289496, guid: ae39200c020c64ff8bd4b89840023683,
         type: 3}
       propertyPath: m_ConnectedAnchor.y
-      value: -0.0014489735
+      value: -0.0014489889
       objectReference: {fileID: 0}
     - target: {fileID: 7087333243876289496, guid: ae39200c020c64ff8bd4b89840023683,
         type: 3}
       propertyPath: m_ConnectedAnchor.z
-      value: -0.0014366601
+      value: -0.0014361329
       objectReference: {fileID: 0}
     - target: {fileID: 7087333243876289496, guid: ae39200c020c64ff8bd4b89840023683,
         type: 3}
       propertyPath: m_ConnectedAnchor.x
-      value: -0.33947444
+      value: -0.33947447
       objectReference: {fileID: 0}
     - target: {fileID: 7087610767370042861, guid: ae39200c020c64ff8bd4b89840023683,
         type: 3}
       propertyPath: myCam
       value: 
       objectReference: {fileID: 1642548955}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 2672166801190889407, guid: ae39200c020c64ff8bd4b89840023683, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: ae39200c020c64ff8bd4b89840023683, type: 3}
 --- !u!1001 &1024269028584676951
 PrefabInstance:
@@ -22071,7 +22118,9 @@ MonoBehaviour:
   colCDTimestamp: 0
   bumpCD: 0
   bumpCDStamp: 0
-  bumpForce: 50
+  bigBumpForce: 0
+  mediumBumpForce: 0
+  smallBumpForce: 0
   isBumped: 0
 --- !u!114 &5138103069064814507
 MonoBehaviour:
@@ -22086,12 +22135,13 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rb: {fileID: 5138103069064814501}
+  isAlive: 1
   maxDragDistance:
     value: 175
   maxSpeed:
     value: 40
   accelerationSpeed:
-    value: 225
+    value: 450
   decelerationSpeed:
     value: 30.29162
   rotationSpeed:
@@ -22102,15 +22152,18 @@ MonoBehaviour:
     value: 20.699892
   kickCD:
     value: 0.06889657
+  kickTime:
+    value: 0.14887477
   lastPlayerInput: {x: 0, y: 0, z: 0}
   swipeTouchTime:
     value: 0.5023464
   canKick: 1
+  isKicking: 1
   beingBumped: 0
   bumpTime: 0.5
-  bumpStamp: 0
+  bumpStamp: 5.06
   maxDashSwipeLength:
-    value: 185.81496
+    value: 50.72843
   minDashForce:
     value: 80.80932
   sameTouchSwipeDist:
@@ -22705,7 +22758,10 @@ PrefabInstance:
       propertyPath: myCam
       value: 
       objectReference: {fileID: 1642548955}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 3273784629784516800, guid: 8b6ad761be08e4e1eadd7076808e8ba7, type: 3}
+    - {fileID: 7647363140490772591, guid: 8b6ad761be08e4e1eadd7076808e8ba7, type: 3}
+    - {fileID: 3273784629784516854, guid: 8b6ad761be08e4e1eadd7076808e8ba7, type: 3}
   m_SourcePrefab: {fileID: 100100000, guid: 8b6ad761be08e4e1eadd7076808e8ba7, type: 3}
 --- !u!1001 &7787886403961826191
 PrefabInstance:

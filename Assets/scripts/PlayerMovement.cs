@@ -28,6 +28,7 @@ public class PlayerMovement : MonoBehaviour
 
     private void Start()
     {
+        isAlive = true;
         rb = GetComponent<Rigidbody>();
         /*  
           DebugMenu.instance.CreateDebugSlider("Max Speed", Color.black, maxSpeed, 80, 1);

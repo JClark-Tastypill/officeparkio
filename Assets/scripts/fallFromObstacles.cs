@@ -13,7 +13,7 @@ public class fallFromObstacles : MonoBehaviour
     public float myVel;
     public bool onColCD;
     public float colCDTime, colCDTimestamp, bumpCD, bumpCDStamp;
-    public float bumpForce;
+    public float bigBumpForce, mediumBumpForce, smallBumpForce;
     public bool isBumped;
     // Start is called before the first frame update
     void Start()
@@ -45,57 +45,79 @@ public class fallFromObstacles : MonoBehaviour
         if (!onColCD)
         {
             if (isPlayer)
-            {
-                
-                if (collision.gameObject.tag == "Player") //when colliding with other players, bump both of them 
+            {                
+                if (collision.gameObject.tag == "Player" && !GetComponent<PlayerMovement>().beingBumped) //when colliding with other players, bump both of them 
                 {
-                    //Debug.Log(GetComponent<PlayerMovement>().)
-                    //if high enough speed, do bump
-                    if(GetComponent<PlayerMovement>().lastPlayerInput.magnitude > collision.gameObject.GetComponent<enemySwiper>().curMoveSpeed && !GetComponent<PlayerMovement>().beingBumped)
+                    if (!GetComponent<PlayerMovement>().canKick && !collision.gameObject.GetComponent<enemySwiper>().isDashing)
                     {
-                        Debug.Log("player speed: " + GetComponent<PlayerMovement>().lastPlayerInput.magnitude + ", enemy speed: " + collision.gameObject.GetComponent<enemySwiper>().curMoveSpeed);
-                        doBump(collision);
-
+                        //Debug.Log("big bump should happen");
+                        playerDoBump(collision, 1);
                     }
-                    
-                    //Debug.DrawRay(this.transform.position, collision.relativeVelocity * 500f, Color.red, 5f);
-                    //Debug.DrawRay(this.transform.position, collision.impulse * 500f, Color.blue, 5f);
-                    //Debug.Log("relativeVel: " + collision.relativeVelocity + ", impulse: " + collision.impulse);
-                }
-                if (collision.gameObject.tag == "obstacle") //when obstacles, see if they can fall off
-                {
-                    //if high enough speed, try to fall
-                    //newCalculateProbability(collision);
-                    //Debug.Log("relativeVel: " + collision.relativeVelocity.magnitude + ", impulse: " + collision.impulse.magnitude);
-                    if (GetComponent<PlayerMovement>().lastPlayerInput.magnitude >= fallOffVel && GetComponent<PlayerMovement>().beingBumped)// && GetComponent<swipeToMove>().isAlive)
+                    if (!GetComponent<PlayerMovement>().canKick && collision.gameObject.GetComponent<enemySwiper>().isDashing)
                     {
-                        //newCalculateProbability(collision);
+                        //Debug.Log("medium bump should happen");
+                        playerDoBump(collision, 2);
+                    }
+                    if (GetComponent<PlayerMovement>().canKick && !collision.gameObject.GetComponent<enemySwiper>().isDashing)
+                    {
+                        //Debug.Log("small bump should happen");
+                        playerDoBump(collision, 3);
+                    }
+                }
+                if (collision.gameObject.tag == "obstacle" && GetComponent<PlayerMovement>().beingBumped) //when obstacles, see if they can fall off
+                {
+                    if (GetComponent<PlayerMovement>().lastPlayerInput.magnitude >= fallOffVel)
+                    {   
                         startDeath();
                     }
                 }
-
             }
+
             else
             {
-                if(collision.gameObject.tag == "Player") //when colliding with other players, bump both of them 
+                if(!GetComponent<enemySwiper>().beingBumped)
                 {
-                    //if high enough speed, do bump
-                    if(collision.gameObject.GetComponent<fallFromObstacles>().isPlayer)
+                    if (collision.gameObject.tag == "Player") //when colliding with other players, bump both of them 
                     {
-                        if (GetComponent<enemySwiper>().curMoveSpeed > collision.gameObject.GetComponent<PlayerMovement>().lastPlayerInput.magnitude && !GetComponent<enemySwiper>().beingBumped)
+                        //if high enough speed, do bump
+                        if (collision.gameObject.GetComponent<fallFromObstacles>().isPlayer)
                         {
-                            Debug.Log("enemy speed: " + GetComponent<enemySwiper>().curMoveSpeed + ", player speed: " + collision.gameObject.GetComponent<PlayerMovement>().lastPlayerInput.magnitude);
-                            doBump(collision);
-                            
+                            if (GetComponent<enemySwiper>().isDashing && !collision.gameObject.GetComponent<enemySwiper>().isDashing)
+                            {
+                                //Debug.Log("big bump should happen");
+                                enemyDoBump(collision, 1);
+                            }
+                            if (GetComponent<enemySwiper>().isDashing && collision.gameObject.GetComponent<enemySwiper>().isDashing)
+                            {
+                                //Debug.Log("medium bump should happen");
+                                enemyDoBump(collision, 2);
+                            }
+                            if (!GetComponent<enemySwiper>().isDashing && !collision.gameObject.GetComponent<enemySwiper>().isDashing)
+                            {
+                                //Debug.Log("small bump should happen");
+                                enemyDoBump(collision, 3);
+                            }
+                        }
+                        else
+                        {
+                            if (GetComponent<enemySwiper>().isDashing && !collision.gameObject.GetComponent<enemySwiper>().isDashing)
+                            {
+                                //Debug.Log("big bump should happen");
+                                enemyDoBump(collision, 1);
+                            }
+                            if (GetComponent<enemySwiper>().isDashing && collision.gameObject.GetComponent<enemySwiper>().isDashing)
+                            {
+                                //Debug.Log("medium bump should happen");
+                                enemyDoBump(collision, 2);
+                            }
+                            if (!GetComponent<enemySwiper>().isDashing && !collision.gameObject.GetComponent<enemySwiper>().isDashing)
+                            {
+                                //Debug.Log("small bump should happen");
+                                enemyDoBump(collision, 3);
+                            }
                         }
                     }
-                    else
-                    {
-                        if (GetComponent<enemySwiper>().curMoveSpeed > collision.gameObject.GetComponent<enemySwiper>().curMoveSpeed && !GetComponent<enemySwiper>().beingBumped)
-                        {
-                            doBump(collision);
-                        }
-                    }
+                
                     
                     //Debug.DrawRay(this.transform.position, collision.relativeVelocity * 50f, Color.white, 5f);
                     //Debug.DrawRay(this.transform.position, collision.impulse * 50f, Color.black, 5f);
@@ -158,26 +180,82 @@ public class fallFromObstacles : MonoBehaviour
 
     }
 
-    public void doBump(Collision c)
+    public void playerDoBump(Collision c, int bumpType)
     {
-        //Debug.DrawRay(this.transform.position, c.impulse * 500f, Color.black, 5f);
-        //Debug.Log("impulse: " + c.impulse);
+        Debug.Log("player is bumping:" + bumpType);
         ContactPoint contact = c.GetContact(0);
-        //Vector3 newDir = c.impulse.normalized;
         Vector3 newDir = new Vector3(contact.point.x - transform.position.x, 0, contact.point.z - transform.position.z);
-        //Debug.Log("newDir " + newDir);
         newDir = newDir.normalized;
         Debug.DrawRay(this.transform.position, newDir * 500f, Color.white, 5f);
-        
-        //GetComponent<Rigidbody>().AddForce(newDir * bumpForce, ForceMode.VelocityChange);
-       // c.gameObject.GetComponent<Rigidbody>().AddForce(newDir * bumpForce, ForceMode.VelocityChange);
-       if(c.gameObject.GetComponent<fallFromObstacles>().isPlayer)
+
+        if (bumpType == 1) // do big bump to another player
         {
-            c.gameObject.GetComponent<PlayerMovement>().getBumped(newDir, bumpForce);
+            c.gameObject.GetComponent<enemySwiper>().getBumped(newDir, bigBumpForce);
+            GetComponent<PlayerMovement>().getBumped(-newDir, smallBumpForce); // bump self backwards
         }
-        else
+
+        if (bumpType == 2) // medium bump to both players
         {
-            c.gameObject.GetComponent<enemySwiper>().getBumped(newDir, bumpForce);
+            c.gameObject.GetComponent<enemySwiper>().getBumped(newDir, mediumBumpForce);
+            GetComponent<PlayerMovement>().getBumped(-newDir, mediumBumpForce); // bump self backwards
+        }
+
+        if (bumpType == 3) // small bump to both players
+        {
+            c.gameObject.GetComponent<enemySwiper>().getBumped(newDir, smallBumpForce);
+            GetComponent<PlayerMovement>().getBumped(-newDir, smallBumpForce); // bump self backwards
+
+        }
+        colCDTimestamp = Time.time + colCDTime;
+        onColCD = true;
+    }
+
+    public void enemyDoBump(Collision c, int bumpType)
+    {
+        Debug.Log("enemy do a bump");
+        ContactPoint contact = c.GetContact(0);
+        Vector3 newDir = new Vector3(contact.point.x - transform.position.x, 0, contact.point.z - transform.position.z);
+        newDir = newDir.normalized;
+        Debug.DrawRay(this.transform.position, newDir * 500f, Color.white, 5f);
+
+        if(bumpType == 1) // do big bump to another player
+        {
+            if (c.gameObject.GetComponent<fallFromObstacles>().isPlayer)
+            {
+                c.gameObject.GetComponent<PlayerMovement>().getBumped(newDir, bigBumpForce);
+            }
+            else
+            {
+                c.gameObject.GetComponent<enemySwiper>().getBumped(newDir, bigBumpForce);
+            }
+            GetComponent<enemySwiper>().getBumped(-newDir, smallBumpForce); // bump self backwards
+        }
+
+        if (bumpType == 2) // medium bump to both players
+        {
+            if (c.gameObject.GetComponent<fallFromObstacles>().isPlayer)
+            {
+                c.gameObject.GetComponent<PlayerMovement>().getBumped(newDir, mediumBumpForce);
+            }
+            else
+            {
+                c.gameObject.GetComponent<enemySwiper>().getBumped(newDir, mediumBumpForce);
+            }
+            GetComponent<enemySwiper>().getBumped(-newDir, smallBumpForce); // bump self backwards
+        }
+
+        if (bumpType == 3) // small bump to both players
+        {
+            if (c.gameObject.GetComponent<fallFromObstacles>().isPlayer)
+            {
+                c.gameObject.GetComponent<PlayerMovement>().getBumped(newDir, smallBumpForce);
+            }
+            else
+            {
+                c.gameObject.GetComponent<enemySwiper>().getBumped(newDir, smallBumpForce);
+            }
+            GetComponent<enemySwiper>().getBumped(-newDir, smallBumpForce); // bump self backwards
+      
         }
         colCDTimestamp = Time.time + colCDTime;
         onColCD = true;

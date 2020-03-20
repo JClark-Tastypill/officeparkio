@@ -10,7 +10,6 @@ public class enemySwiper : MonoBehaviour
     public float roamTime, agroTime, bumpTime, dashTime, dashCDTime;
     public float moveStamp; // only stamp used to determine when enemy should make their next move
     public float dashStamp; // so enemies only dash once in a while, it's on a cooldown
-    public bool canDash;
     public Vector3 target;
     public GameObject targetEnemy;
     public float reachTargetRange;
@@ -472,7 +471,7 @@ public class enemySwiper : MonoBehaviour
         }
         else
         {
-            Debug.Log("I am bumped");
+            //Debug.Log("I am bumped");
             rb.MovePosition(transform.position + curTargetDir * Time.fixedDeltaTime);     
         }
     }

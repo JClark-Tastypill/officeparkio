@@ -34,6 +34,7 @@ public class enemySwiper : MonoBehaviour
     public bool isDashing = true;
     public float dashForce;
     private float bumpForce;
+    private int lastKindofBump;
     
     public enum EnemyState
     {
@@ -41,9 +42,10 @@ public class enemySwiper : MonoBehaviour
         Roam,
         Aggro,
         Dash,
-        Bumped
+        Bumped,
+        Hide
     };
-    private EnemyState currentState = EnemyState.None;
+    public EnemyState currentState = EnemyState.None;
 
     void Start()
     {
@@ -75,6 +77,9 @@ public class enemySwiper : MonoBehaviour
             case EnemyState.Bumped:
                 moveDirection = HandleBumped();
                 break;
+            case EnemyState.Hide:
+                moveDirection = HandleHide();
+                break;
 
         }
 
@@ -82,7 +87,7 @@ public class enemySwiper : MonoBehaviour
  }
     public void gotoRoam()
     {
-        Debug.Log("go to roam");
+        //Debug.Log("go to roam");
         checkClosestPlayer();
         if (Time.fixedTime >= dashStamp)
         {
@@ -106,7 +111,7 @@ public class enemySwiper : MonoBehaviour
 
     public void goToAggro()
     {
-        Debug.Log("go to aggro");
+        //Debug.Log("go to aggro");
         checkClosestPlayer();
         pathFind();
         newMoveSpeed(2);
@@ -116,31 +121,35 @@ public class enemySwiper : MonoBehaviour
 
     public void goToDash()
     {
-        Debug.Log("go to dash");
+        //Debug.Log("go to dash");
         checkClosestPlayer();
         pathFind();
         newMoveSpeed(3);
-        moveStamp = Time.time + dashTime;
+        moveStamp = Time.time + dashTime;        
         isDashing = true;
         currentState = EnemyState.Dash;
     }
 
-    public void goToBumped()
+    public void goToBumped(Vector3 bumpDir, float bForce)
     {
-        Debug.Log("go to bumped");
-        //newMoveSpeed(false);
-        newMoveSpeed(4);
+        target = bumpDir * bForce;
+        curMoveSpeed = bForce;
+        beingBumped = true;
         moveStamp = Time.time + bumpTime;
         currentState = EnemyState.Bumped;
     }
 
+    public void goToHide()
+    {
+        //Debug.Log("go to hide");
+        hidePathFind();
+        newMoveSpeed(2);
+        moveStamp = Time.time + roamTime;
+        currentState = EnemyState.Hide;
+    }
+
     public Vector3 HandleRoam() 
     {
-        /*if time is up or reach target, next move
-         *
-         *
-         */
-        //Debug.Log("distance to target: " + Vector3.Distance(transform.position, target) + ", target range: " + reachTargetRange);
         if(Vector3.Distance(transform.position, target) <= reachTargetRange || Time.fixedTime>= moveStamp)
         {
             
@@ -149,6 +158,7 @@ public class enemySwiper : MonoBehaviour
         faceTarget();
         return target;
     }
+
     public Vector3 HandleAggro()
     {
         //if time is up , next move
@@ -156,7 +166,9 @@ public class enemySwiper : MonoBehaviour
         {
             determineState();
         }
-        if(Vector3.Distance(transform.position, target) <= dashRange)
+        //if in range of enemy, make a dash
+        //Debug.Log("dash range: " + dashRange);
+        if(Vector3.Distance(transform.position, closestTarget.transform.position) <= dashRange) 
         {
             if(Time.fixedTime >= dashStamp)
             {
@@ -164,18 +176,22 @@ public class enemySwiper : MonoBehaviour
             }
             else
             {
-                determineState();
+                //determineState();
             }
             
         }
 
-            // if close enough for a dash, do a dash
-            faceTarget();
+        //add in chance to hide instead of dash
+
+        faceTarget();
         return target;
     }
     public Vector3 HandleDash()
     {
         //quick dash forward, cooldown on aggro, next move
+
+        faceTarget();
+        target = closestTarget.transform.position;
         if (Time.fixedTime >= moveStamp)
         {
             dashStamp = Time.fixedTime + dashTime;
@@ -183,6 +199,7 @@ public class enemySwiper : MonoBehaviour
             //gotoRoam();
             determineState();
         }
+        
         return target;
     }
     public Vector3 HandleBumped()
@@ -190,15 +207,29 @@ public class enemySwiper : MonoBehaviour
         // move in bump direction until time is up
         if(Time.fixedTime >= moveStamp)
         {
+            if(lastKindofBump == 1 || lastKindofBump == 2)
+            {
+                dashStamp = Time.time + dashCDTime;
+            }            
             beingBumped = false;
             determineState();
         }
         return target;
     }
 
+    public Vector3 HandleHide()
+    {
+        if (Vector3.Distance(transform.position, target) <= reachTargetRange || Time.fixedTime >= moveStamp)
+        {
+            determineState();
+        }
+        faceTarget();
+        return target;
+    }
+
     public void determineState() //see which state enemy should go in based on cooldowns and position/visability of other players
     {
-        Debug.Log("determining state");
+        isDashing = false;
         if(Time.time >= dashStamp)
         {
             checkClosestPlayer(); // find closest player, and if they are visable
@@ -216,13 +247,20 @@ public class enemySwiper : MonoBehaviour
             }
             else
             {
-                //randomPathfind();
                 gotoRoam();
             }
         }
         else
         {
-            gotoRoam();
+            checkClosestPlayer(); // find closest player, and if they are visable
+            if (seesPlayer)
+            {
+                goToHide();
+            }
+            else
+            {
+                gotoRoam();
+            }
         }
         
     }
@@ -298,18 +336,14 @@ public class enemySwiper : MonoBehaviour
      
  }
 
- public void pathFind() // determines the best vector to move in
+ public void pathFind() // determines the best vector to move in towards closest enemy
  {
-        //Debug.Log("regular pathfind");
-     //checkClosestPlayer(); // find closest player
-
      // shoot rays in 16 directions
      // check which ones aren't obscured by obstacles
      // determine the ray that moves closest to closest player
      // move in that direction
      Vector3 newDir = new Vector3(0, 0, 0);
      bestAngleDist = 0;
-
      for (int i = 0; i < 16; i++)
      {
          float angleOfRaycast = i * 360 / 16;
@@ -318,7 +352,7 @@ public class enemySwiper : MonoBehaviour
          RaycastHit inf = new RaycastHit();
          if (!Physics.Raycast(transform.position, v, out inf, rayLength, LayerMask.GetMask("wall", "big stuff"))) // for angles that DONT hit any walls in range
          {
-             Debug.DrawRay(this.transform.position, v * rayLength, Color.green, 2f);
+             //Debug.DrawRay(this.transform.position, v * rayLength, Color.green, 2f);
              if (Vector3.Distance(v.normalized, closestTargetDir.normalized) > bestAngleDist)
              {
                     bestAngleDist = Vector3.Distance(v.normalized, closestTargetDir.normalized);
@@ -329,15 +363,11 @@ public class enemySwiper : MonoBehaviour
             {
                 if (Vector3.Distance(transform.position, inf.transform.position) > minMoveDistance)
                 {
-                    //Debug.DrawRay(this.transform.position, v * minMoveDistance, Color.yellow, 2f);
-                    if (Vector3.Distance(v.normalized, closestTargetDir.normalized) > bestAngleDist)
-                    {
 
-                    }
                 }
                 else
                 {
-                    Debug.DrawRay(this.transform.position, v * minMoveDistance, Color.red, 2f);
+                    //Debug.DrawRay(this.transform.position, v * minMoveDistance, Color.red, 2f);
                 }
 
             }
@@ -348,8 +378,33 @@ public class enemySwiper : MonoBehaviour
         hasTarget = true;
     }
 
+    public void hidePathFind() // find path furthest away from closest player
+    {
+        Vector3 newDir = new Vector3(0, 0, 0);
+        bestAngleDist = 360;
 
-    public void randomPathfind()
+        for (int i = 0; i < 16; i++)
+        {
+            float angleOfRaycast = i * 360 / 16;
+            //figure out vector of that angle
+            Vector3 v = new Vector3(Mathf.Cos(angleOfRaycast * Mathf.Deg2Rad), 0, Mathf.Sin(angleOfRaycast * Mathf.Deg2Rad));
+            RaycastHit inf = new RaycastHit();
+            if (!Physics.Raycast(transform.position, v, out inf, rayLength, LayerMask.GetMask("wall", "big stuff"))) // for angles that DONT hit any walls in range
+            {
+                //Debug.DrawRay(this.transform.position, v * rayLength, Color.green, 2f);
+                if (Vector3.Distance(v.normalized, closestTargetDir.normalized) < bestAngleDist)
+                {
+                    bestAngleDist = Vector3.Distance(v.normalized, closestTargetDir.normalized);
+                    newDir = v;
+                }
+            }            
+        }
+        float targetRange = Random.Range(minTargetRange, maxTargetRange);
+        target = transform.position + (newDir * targetRange);
+        hasTarget = true;
+    }
+
+    public void randomPathfind() // move in most open direction
     {
         //Debug.Log("randompathfind");
         Vector3 newDir = new Vector3(0, 0, 0);
@@ -377,71 +432,8 @@ public class enemySwiper : MonoBehaviour
         }
         float targetRange = Random.Range(minMove, biggestMove);
         target = transform.position + (newDir * targetRange);
-        //targetCDStamp = Time.time + targetCD;
         hasTarget = true;
-        Debug.DrawRay(this.transform.position, newDir * minMoveDistance, Color.yellow, 2f);
-    }
-
-
-    public void newTarget() // dont use this any more
-    {
-        // find closest enemy
-        // do a scatter shot
-        //  *** randomize scatter a bit more
-        // determine which rays are 
-        // find ray that is closest to target direction
-        // **** small chance just go in a random direction instead
-        //if can go min distance without hitting something, go that way
-        //else go in next closest ray
-
-        // go slower around obstacles
-
-        // set target within range, cast rays that way to make sure it's a good path, if not try again
-        //if after so many tries, just move into the wall
-
-        checkClosestPlayer();
-
-        Vector3 newDir = new Vector3(0, 0, 0);
-        bestAngleDist = 0;
-        //rayLength = minMoveDistance;
-        for (int i = 0; i < 8; i++)
-        {
-            float angleOfRaycast = i * 360 / 8;
-            //figure out vector of that angle
-            Vector3 v = new Vector3(Mathf.Cos(angleOfRaycast * Mathf.Deg2Rad), 0, Mathf.Sin(angleOfRaycast * Mathf.Deg2Rad));
-            RaycastHit inf = new RaycastHit();
-
-            if (!Physics.Raycast(transform.position, v, out inf, rayLength, LayerMask.GetMask("wall", "big stuff"))) // for angles that have clear path ahead
-            {
-
-                Debug.DrawRay(this.transform.position, v * rayLength, Color.green, 2f);
-
-                if (Vector3.Distance(v.normalized, closestTargetDir.normalized) < bestAngleDist)
-                {
-                    bestAngleDist = Vector3.Distance(v.normalized, closestTargetDir.normalized);
-                    newDir = v;
-                }
-            }
-            else
-            {
-                //for angles that hit something
-                if (Vector3.Distance(transform.position, inf.transform.position) >= minMoveDistance)
-                {
-                    if (Vector3.Distance(v.normalized, closestTargetDir.normalized) < bestAngleDist)
-                    {
-                        bestAngleDist = Vector3.Distance(v.normalized, closestTargetDir.normalized);
-                        newDir = v;
-                    }
-
-                }
-            }
-        }
-        float targetRange = Random.Range(minTargetRange, maxTargetRange);
-        target = transform.position + (newDir * targetRange);
-        //targetCDStamp = Time.time + targetCD;
-        hasTarget = true;
-        Debug.DrawRay(this.transform.position, newDir * minMoveDistance, Color.yellow, 2f);
-
+        //Debug.DrawRay(this.transform.position, newDir * minMoveDistance, Color.yellow, 2f);
     }
 
     public void faceTarget() // rotate towards target vector
@@ -451,39 +443,28 @@ public class enemySwiper : MonoBehaviour
         transform.rotation = Quaternion.Lerp(transform.rotation, lookRotation, rotationSpeed * Time.deltaTime);
     }
 
-    public void steadyMove(Vector3 myDir) // move player per frame
+    public void steadyMove(Vector3 myTarget) // move player per frame
     {
-
-        curTargetDir = (myDir - this.transform.position).normalized;
-        //Debug.Log("cur target dir: " + curTargetDir);
-        curTargetDir = curTargetDir * curMoveSpeed;
-        
         if (!beingBumped)
         {
+            curTargetDir = (myTarget - this.transform.position).normalized;
+            curTargetDir = curTargetDir * curMoveSpeed;
             rb.MovePosition(transform.position + curTargetDir * Time.fixedDeltaTime);
             if (isDashing)
             {
-                Debug.DrawLine(this.transform.position, curTargetDir * dashRange, Color.cyan, 2f);
-                //agroCDStamp = Time.time + agroCD;
-                //dashStamp = Time.time + dashTime;
-                //isAgro = false;
-                //isDashing = false;
+                //Debug.DrawLine(this.transform.position, curTargetDir * dashRange, Color.cyan, 2f);
             }
         }
         else
         {
-            //Debug.Log("I am bumped");
-            rb.MovePosition(transform.position + curTargetDir * Time.fixedDeltaTime);     
+            rb.MovePosition(transform.position + myTarget * Time.fixedDeltaTime);     
         }
     }
 
     public void becomeAgro(GameObject other)
     {
         isAgro = true;
-       // agroTimerStamp = Time.time + agroTime;
         targetEnemy = other.gameObject;
-       // slowCDStamp = Time.time + slowCDTime;
-        //isSlow = false;
     }
     public void findOthers()
     {
@@ -507,19 +488,8 @@ public class enemySwiper : MonoBehaviour
         }
         if (state == 4) //be bumped by something else
         {
-            Debug.Log("using this");
             curMoveSpeed = bumpForce;
         }
-    }
-
-    public void getBumped(Vector3 newDir, float bForce)
-    {
-        goToBumped();
-        bumpForce = bForce;
-        target = newDir * bForce;
-        curMoveSpeed = bForce;        
-        beingBumped = true;
-       // bumpStamp = Time.time + bumpTime;
     }
 
     public void doDash()

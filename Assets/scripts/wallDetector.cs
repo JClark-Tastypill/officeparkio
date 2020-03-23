@@ -22,7 +22,7 @@ public class wallDetector : MonoBehaviour
             //Debug.Log("wall dected");
             if(!transform.parent.GetComponent<enemySwiper>().isAgro)
             {
-                transform.parent.GetComponent<enemySwiper>().newTarget();
+                //transform.parent.GetComponent<enemySwiper>().newTarget();
             }
             
         }

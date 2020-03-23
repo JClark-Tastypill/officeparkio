@@ -8,7 +8,7 @@ public class PlayerMovement : MonoBehaviour
     public Rigidbody rb;
     public bool isAlive = true;
     public DebugFloat maxDragDistance = 175f;
-    public DebugFloat maxSpeed = 40f, accelerationSpeed = 450f, decelerationSpeed = 30f, rotationSpeed = 10f, dashForce = 140f, dashSwipeLength = 225f, kickCD = .06f, kickTime = .15f;
+    public DebugFloat maxSpeed = 40f, accelerationSpeed = 450f, decelerationSpeed = 30f, rotationSpeed = 10f, dashForce = 140f, dashSwipeLength = 225f, kickCD = .5f, kickTime = .5f;
     //public DebugFloat activeDecelerationRate
 
     private Vector2 tapStartPosition;
@@ -155,7 +155,6 @@ public class PlayerMovement : MonoBehaviour
         newDir = newDir.normalized * dashForce;
 
         lastPlayerInput = newDir;//.normalized * dashForce;
-        Debug.Log("dash force: " + lastPlayerInput.magnitude);
         kickCDStamp = Time.fixedTime + kickCD;
         Quaternion newLook = Quaternion.LookRotation(newDir);
         rb.MoveRotation(Quaternion.Lerp(transform.rotation, newLook, rotationSpeed * Time.deltaTime));
@@ -164,7 +163,7 @@ public class PlayerMovement : MonoBehaviour
 
     public void getBumped(Vector3 newDir, float bumpForce)
     {
-        Debug.Log("player bumped");
+        //Debug.Log("player bumped");
         lastPlayerInput = newDir * bumpForce;
         beingBumped = true;
         bumpStamp = Time.time + bumpTime;

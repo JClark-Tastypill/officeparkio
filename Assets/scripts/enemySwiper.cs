@@ -35,7 +35,10 @@ public class enemySwiper : MonoBehaviour
     public float dashForce;
     private float bumpForce;
     private int lastKindofBump;
-    
+    public Vector3 lastTargetDir;
+    public float waitTimelow, waitTimeHigh;
+    private bool isWaiting;
+    public float chanceRunAway;
     public enum EnemyState
     {
         None,
@@ -43,6 +46,7 @@ public class enemySwiper : MonoBehaviour
         Aggro,
         Dash,
         Bumped,
+        Wait,
         Hide
     };
     public EnemyState currentState = EnemyState.None;
@@ -61,7 +65,6 @@ public class enemySwiper : MonoBehaviour
         {
             return;
         }
-
         Vector3 moveDirection = Vector3.zero;
         switch (currentState)
         {
@@ -77,13 +80,18 @@ public class enemySwiper : MonoBehaviour
             case EnemyState.Bumped:
                 moveDirection = HandleBumped();
                 break;
+            case EnemyState.Wait:
+                moveDirection = handleWait();
+                break;
             case EnemyState.Hide:
                 moveDirection = HandleHide();
-                break;
-
+                break;           
         }
-
-        steadyMove(moveDirection);
+        if(!isWaiting)
+        {
+            steadyMove(moveDirection);
+        }
+        
  }
     public void gotoRoam()
     {
@@ -132,6 +140,7 @@ public class enemySwiper : MonoBehaviour
 
     public void goToBumped(Vector3 bumpDir, float bForce)
     {
+        isWaiting = false;
         target = bumpDir * bForce;
         curMoveSpeed = bForce;
         beingBumped = true;
@@ -142,10 +151,51 @@ public class enemySwiper : MonoBehaviour
     public void goToHide()
     {
         //Debug.Log("go to hide");
-        hidePathFind();
+        if(chanceRunAway >= Random.Range(1, 101))
+        {
+            randomPathfind();
+        }
+        else
+        {
+            hidePathFind();
+        }        
         newMoveSpeed(2);
         moveStamp = Time.time + roamTime;
         currentState = EnemyState.Hide;
+    }
+
+    public void goToWait()
+    {
+        beingBumped = false;
+        isAgro = false;
+        isDashing = false;
+        moveStamp = Time.time + (Random.Range(waitTimelow, waitTimeHigh));
+        isWaiting = true;
+        currentState = EnemyState.Wait;
+    }
+
+    public Vector3 handleWait()
+    {
+        if(Time.time >= moveStamp)
+        {
+            if (Time.fixedTime >= dashStamp && Vector3.Distance(transform.position, closestTarget.transform.position) <= dashRange)
+            {
+                float randomChance = Random.Range(1, 101);
+                {
+                    if (chanceRunAway >= randomChance)
+                    {
+                        goToHide();
+                    }
+                    else
+                    {
+                        goToDash();
+                    }
+                }
+            }
+            determineState();
+        }
+
+        return Vector3.zero;
     }
 
     public Vector3 HandleRoam() 
@@ -172,12 +222,19 @@ public class enemySwiper : MonoBehaviour
         {
             if(Time.fixedTime >= dashStamp)
             {
-                goToDash();
+                float randomChance = Random.Range(1, 101);
+                {
+                    if(chanceRunAway >= randomChance)
+                    {
+                        goToHide();
+                    }
+                    else
+                    {
+                        goToDash();
+                    }
+                }
             }
-            else
-            {
-                //determineState();
-            }
+
             
         }
 
@@ -197,7 +254,8 @@ public class enemySwiper : MonoBehaviour
             dashStamp = Time.fixedTime + dashTime;
             isDashing = false;
             //gotoRoam();
-            determineState();
+            //determineState();
+            goToWait();
         }
         
         return target;
@@ -207,12 +265,10 @@ public class enemySwiper : MonoBehaviour
         // move in bump direction until time is up
         if(Time.fixedTime >= moveStamp)
         {
-            if(lastKindofBump == 1 || lastKindofBump == 2)
-            {
-                dashStamp = Time.time + dashCDTime;
-            }            
+            dashStamp = Time.time + dashCDTime;
             beingBumped = false;
-            determineState();
+            goToWait();
+            //determineState();
         }
         return target;
     }
@@ -229,6 +285,7 @@ public class enemySwiper : MonoBehaviour
 
     public void determineState() //see which state enemy should go in based on cooldowns and position/visability of other players
     {
+        isWaiting = false;
         isDashing = false;
         if(Time.time >= dashStamp)
         {

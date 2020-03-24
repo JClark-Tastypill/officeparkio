@@ -100,7 +100,7 @@ public class PlayerMovement : MonoBehaviour
             if (Input.GetTouch(0).phase == TouchPhase.Ended) // touch end
             {
                 float swipeMag = Input.GetTouch(0).deltaPosition.magnitude;
-                if (swipeMag >= maxDashSwipeLength && canKick)
+                if (swipeMag >= maxDashSwipeLength && canKick && !beingBumped)
                 {
                     doKick(new Vector3(inputDiff.x, 0, inputDiff.y));
                 }
@@ -164,7 +164,7 @@ public class PlayerMovement : MonoBehaviour
     public void getBumped(Vector3 newDir, float bumpForce)
     {
         //Debug.Log("player bumped");
-        lastPlayerInput = newDir * bumpForce;
+        lastPlayerInput += newDir * bumpForce;
         beingBumped = true;
         bumpStamp = Time.time + bumpTime;
     }

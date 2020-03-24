@@ -1625,27 +1625,27 @@ PrefabInstance:
     - target: {fileID: 5225488575934197254, guid: 6fdb94051ac684a60a89c8e1f99c37d9,
         type: 3}
       propertyPath: m_AnchorMin.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5225488575934197254, guid: 6fdb94051ac684a60a89c8e1f99c37d9,
         type: 3}
       propertyPath: m_AnchorMax.y
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 5225488575934197254, guid: 6fdb94051ac684a60a89c8e1f99c37d9,
         type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 0
+      value: 244.5
       objectReference: {fileID: 0}
     - target: {fileID: 5225488575934197254, guid: 6fdb94051ac684a60a89c8e1f99c37d9,
         type: 3}
       propertyPath: m_AnchoredPosition.y
-      value: 0
+      value: -45
       objectReference: {fileID: 0}
     - target: {fileID: 5225488575934197254, guid: 6fdb94051ac684a60a89c8e1f99c37d9,
         type: 3}
       propertyPath: m_SizeDelta.x
-      value: 0
+      value: 449
       objectReference: {fileID: 0}
     - target: {fileID: 5225488575934197254, guid: 6fdb94051ac684a60a89c8e1f99c37d9,
         type: 3}
@@ -1721,7 +1721,7 @@ PrefabInstance:
     - target: {fileID: 5225488577068115421, guid: 6fdb94051ac684a60a89c8e1f99c37d9,
         type: 3}
       propertyPath: m_RootOrder
-      value: 6
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 5225488577068115421, guid: 6fdb94051ac684a60a89c8e1f99c37d9,
         type: 3}
@@ -3089,7 +3089,7 @@ PrefabInstance:
     - target: {fileID: 7407183107814178824, guid: ed8c31514d4b047f89276aea771520ec,
         type: 3}
       propertyPath: m_RootOrder
-      value: 7
+      value: 6
       objectReference: {fileID: 0}
     - target: {fileID: 7407183107814178824, guid: ed8c31514d4b047f89276aea771520ec,
         type: 3}
@@ -3576,7 +3576,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 5
+  m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 50, y: -30, z: 0}
 --- !u!4 &396595719 stripped
 Transform:
@@ -4097,7 +4097,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8b4415b22c3b14474b1777e33195dba1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  fallOffVel: 10
+  fallOffVel: 30
   maxVel: 0
   myHuman: {fileID: 1943216713}
   exForce: 1500
@@ -4112,11 +4112,13 @@ MonoBehaviour:
   colCDTimestamp: 0
   bumpCD: 0
   bumpCDStamp: 0
-  bigBumpForce: 70
-  mediumBumpForce: 45
-  smallBumpForce: 30
+  bigBumpForce: 60
+  mediumBumpForce: 30
+  smallBumpForce: 15
   isBumped: 0
   myDebugColor: {r: 0, g: 0, b: 0, a: 0}
+  debugPlayerNum: 0
+  minReflectValue: 0
 --- !u!4 &490653092 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 2294424740278511561, guid: d2da8afbfaef64274913f785e26aa6c4,
@@ -8017,7 +8019,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8b4415b22c3b14474b1777e33195dba1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  fallOffVel: 10
+  fallOffVel: 30
   maxVel: 0
   myHuman: {fileID: 813736428}
   exForce: 1500
@@ -8032,11 +8034,13 @@ MonoBehaviour:
   colCDTimestamp: 0
   bumpCD: 0
   bumpCDStamp: 0
-  bigBumpForce: 70
-  mediumBumpForce: 45
-  smallBumpForce: 30
+  bigBumpForce: 60
+  mediumBumpForce: 30
+  smallBumpForce: 15
   isBumped: 0
   myDebugColor: {r: 0, g: 1, b: 0.49324107, a: 1}
+  debugPlayerNum: 2
+  minReflectValue: 0
 --- !u!1001 &949712985
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -11155,7 +11159,7 @@ PrefabInstance:
     - target: {fileID: 2672166801190889398, guid: ae39200c020c64ff8bd4b89840023683,
         type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2672166801190889399, guid: ae39200c020c64ff8bd4b89840023683,
         type: 3}
@@ -16779,7 +16783,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 8
+  m_RootOrder: 7
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &1763126756 stripped
 Transform:
@@ -18500,7 +18504,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8b4415b22c3b14474b1777e33195dba1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  fallOffVel: 10
+  fallOffVel: 30
   maxVel: 0
   myHuman: {fileID: 735340868}
   exForce: 1500
@@ -18515,11 +18519,13 @@ MonoBehaviour:
   colCDTimestamp: 0
   bumpCD: 0
   bumpCDStamp: 0
-  bigBumpForce: 70
-  mediumBumpForce: 45
-  smallBumpForce: 30
+  bigBumpForce: 60
+  mediumBumpForce: 30
+  smallBumpForce: 15
   isBumped: 0
   myDebugColor: {r: 1, g: 0.81539816, b: 0, a: 1}
+  debugPlayerNum: 1
+  minReflectValue: 0
 --- !u!1001 &2105350992
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -20917,7 +20923,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8b4415b22c3b14474b1777e33195dba1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  fallOffVel: 10
+  fallOffVel: 30
   maxVel: 100
   myHuman: {fileID: 770788610}
   exForce: 1500
@@ -20932,11 +20938,13 @@ MonoBehaviour:
   colCDTimestamp: 0
   bumpCD: 0
   bumpCDStamp: 0
-  bigBumpForce: 70
-  mediumBumpForce: 45
-  smallBumpForce: 30
+  bigBumpForce: 60
+  mediumBumpForce: 30
+  smallBumpForce: 15
   isBumped: 0
   myDebugColor: {r: 0, g: 0, b: 0, a: 0}
+  debugPlayerNum: 0
+  minReflectValue: 0.2
 --- !u!114 &5138103069064814507
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -21381,7 +21389,7 @@ PrefabInstance:
     - target: {fileID: 3273784629784516809, guid: 8b6ad761be08e4e1eadd7076808e8ba7,
         type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3273784629784516853, guid: 8b6ad761be08e4e1eadd7076808e8ba7,
         type: 3}
@@ -21421,7 +21429,7 @@ PrefabInstance:
     - target: {fileID: 3273784629784516853, guid: 8b6ad761be08e4e1eadd7076808e8ba7,
         type: 3}
       propertyPath: m_RootOrder
-      value: 4
+      value: 8
       objectReference: {fileID: 0}
     - target: {fileID: 3273784629784516853, guid: 8b6ad761be08e4e1eadd7076808e8ba7,
         type: 3}

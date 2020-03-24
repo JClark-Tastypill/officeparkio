@@ -141,7 +141,7 @@ public class enemySwiper : MonoBehaviour
     public void goToBumped(Vector3 bumpDir, float bForce)
     {
         isWaiting = false;
-        target = bumpDir * bForce;
+        target += bumpDir * bForce;
         curMoveSpeed = bForce;
         beingBumped = true;
         moveStamp = Time.time + bumpTime;
@@ -151,7 +151,7 @@ public class enemySwiper : MonoBehaviour
     public void goToHide()
     {
         //Debug.Log("go to hide");
-        if(chanceRunAway >= Random.Range(1, 101))
+        if(chanceRunAway * 2 >= Random.Range(1, 101))
         {
             randomPathfind();
         }
@@ -543,10 +543,7 @@ public class enemySwiper : MonoBehaviour
         {
             curMoveSpeed = dashForce;
         }
-        if (state == 4) //be bumped by something else
-        {
-            curMoveSpeed = bumpForce;
-        }
+
     }
 
     public void doDash()

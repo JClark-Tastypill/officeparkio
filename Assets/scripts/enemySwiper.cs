@@ -141,7 +141,7 @@ public class enemySwiper : MonoBehaviour
     public void goToBumped(Vector3 bumpDir, float bForce)
     {
         isWaiting = false;
-        target += bumpDir * bForce;
+        target = bumpDir * bForce;
         curMoveSpeed = bForce;
         beingBumped = true;
         moveStamp = Time.time + bumpTime;

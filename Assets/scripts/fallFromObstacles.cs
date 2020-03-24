@@ -1,5 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
+using Tastypill.Debug;
 using UnityEngine;
 
 public class fallFromObstacles : MonoBehaviour
@@ -13,15 +14,20 @@ public class fallFromObstacles : MonoBehaviour
     public float myVel;
     public bool onColCD;
     public float colCDTime, colCDTimestamp, bumpCD, bumpCDStamp;
-    public float bigBumpForce, mediumBumpForce, smallBumpForce;
+    //public float bigBumpF, mediumBumpF, smallBumpF;
     public bool isBumped;
     public Color myDebugColor;
     public int debugPlayerNum;
     public float minReflectValue; // if dot product is below this, do opposite bump
+    public DebugFloat bigBumpF = 70f, mediumBumpF = 40f, smallBumpF = 15f, fallOffVelocity = 30f;
+
     // Start is called before the first frame update
     void Start()
     {
-        
+        DebugMenu.instance.CreateDebugSlider("small bump force", Color.white, smallBumpF, 100, 0);
+        DebugMenu.instance.CreateDebugSlider("medium bump force", Color.white, mediumBumpF, 100, 0);
+        DebugMenu.instance.CreateDebugSlider("large bump force", Color.white, bigBumpF, 100, 0);
+        DebugMenu.instance.CreateDebugSlider("fall out of chair velocity", Color.white, fallOffVelocity, 100, 0);
     }
 
     void FixedUpdate()
@@ -46,47 +52,42 @@ public class fallFromObstacles : MonoBehaviour
     {
         if (isPlayer) // player logic
         {
-            //Debug.Log("play collides with: " + collision.gameObject.tag + ", at velocity: " + GetComponent<PlayerMovement>().lastPlayerInput.magnitude + ", and being bumped = " + GetComponent<PlayerMovement>().beingBumped);
-            if (collision.gameObject.tag == "Player" && !onColCD) //when colliding with other players, bump both of them 
+           if (collision.gameObject.tag == "Player" && !onColCD) //when colliding with other players, bump both of them 
             {               
                 //Debug.Log("player bumped into: " + collision.gameObject.tag);
                 if (!GetComponent<PlayerMovement>().canKick && !collision.gameObject.GetComponent<enemySwiper>().isDashing)
                 {
                     //Debug.Log("big bump should happen");
-                    //playerDoBump(collision, 1);
-                    doBump(collision, bigBumpForce);
+                    doBump(collision, bigBumpF);
                 }
                 if (!GetComponent<PlayerMovement>().canKick && collision.gameObject.GetComponent<enemySwiper>().isDashing)
                 {
                     //Debug.Log("medium bump should happen");
-                    //playerDoBump(collision, 2);
-                    doBump(collision, mediumBumpForce);
+                    doBump(collision, mediumBumpF);
                 }
                 if (GetComponent<PlayerMovement>().canKick)
                 {
                     //Debug.Log("small bump should happen");
-                    //playerDoBump(collision, 3);
-                    doBump(collision, smallBumpForce);
+                    doBump(collision, smallBumpF);
                 }
+                goOnCD();
             }
             if (collision.gameObject.tag == "obstacle") //when obstacles, see if they can fall off, otherwise bounce off
             {
                 if(GetComponent<PlayerMovement>().beingBumped)
                 {
-                    if (GetComponent<PlayerMovement>().lastPlayerInput.magnitude >= fallOffVel)
+                    if (GetComponent<PlayerMovement>().lastPlayerInput.magnitude >= fallOffVelocity)
                     {
                         startDeath();
                     }
                     else
                     {
-                        Vector3 reflectDir = Vector3.Reflect(GetComponent<PlayerMovement>().lastPlayerInput, collision.GetContact(0).point.normalized);
-                        GetComponent<PlayerMovement>().lastPlayerInput = reflectDir;
+                        bounceOffWall(collision);
                     }
                 }
                 else
                 {
-                    Vector3 reflectDir = Vector3.Reflect(GetComponent<PlayerMovement>().lastPlayerInput, collision.GetContact(0).point.normalized);
-                    GetComponent<PlayerMovement>().lastPlayerInput = reflectDir;
+                    bounceOffWall(collision);
                 }
             }
         }
@@ -100,17 +101,17 @@ public class fallFromObstacles : MonoBehaviour
                     if (GetComponent<enemySwiper>().isDashing && collision.gameObject.GetComponent<PlayerMovement>().canKick)
                     {
                         //Debug.Log("big bump should happen");
-                        doBump(collision, bigBumpForce);
+                        doBump(collision, bigBumpF);
                     }
                     if (GetComponent<enemySwiper>().isDashing && !collision.gameObject.GetComponent<PlayerMovement>().canKick)
                     {
                         //Debug.Log("medium bump should happen");
-                        doBump(collision, mediumBumpForce);
+                        doBump(collision, mediumBumpF);
                     }
                     if (!GetComponent<enemySwiper>().isDashing)
                     {
                         //Debug.Log("small bump should happen");
-                        doBump(collision, smallBumpForce);
+                        doBump(collision, smallBumpF);
                     }
                 }
                 else
@@ -119,34 +120,35 @@ public class fallFromObstacles : MonoBehaviour
                     {
                         //Debug.Log("big bump should happen");
                         //enemyDoBump(collision, 1);
-                        doBump(collision, bigBumpForce);
+                        doBump(collision, bigBumpF);
                     }
                     if (GetComponent<enemySwiper>().isDashing && collision.gameObject.GetComponent<enemySwiper>().isDashing)
                     {
                         //Debug.Log("medium bump should happen");
                         //enemyDoBump(collision, 2);
-                        doBump(collision, mediumBumpForce);
+                        doBump(collision, mediumBumpF);
                     }
                     if (!GetComponent<enemySwiper>().isDashing)
                     {
                         //Debug.Log("small bump should happen");
                         //enemyDoBump(collision, 3);
-                        doBump(collision, smallBumpForce);
+                        doBump(collision, smallBumpF);
                     }
                 }
+                goOnCD();
             }
             if (collision.gameObject.tag == "obstacle") //when obstacles, see if they can fall off
             {
                 if (GetComponent<enemySwiper>().beingBumped)
                 {
-                    if (GetComponent<enemySwiper>().curTargetDir.magnitude >= fallOffVel)
+                    if (GetComponent<enemySwiper>().curTargetDir.magnitude >= fallOffVelocity)
                     {
                         startDeath();
                     }
                     else
                     {
-                        Vector3 reflectDir = Vector3.Reflect(GetComponent<enemySwiper>().curTargetDir, collision.GetContact(0).point.normalized);
-                        GetComponent<enemySwiper>().curTargetDir = reflectDir;
+                        Debug.Log("enemy reflect!");
+                        bounceOffWall(collision);
                     }
                 }
                 else
@@ -155,6 +157,25 @@ public class fallFromObstacles : MonoBehaviour
                 }
             }
         }
+    }
+
+    public void bounceOffWall(Collision c)
+    {
+        ContactPoint contact = c.GetContact(0);
+        Vector3 bounceDir = contact.normal;
+        if(isPlayer)
+        {
+            float curForce = GetComponent<PlayerMovement>().lastPlayerInput.magnitude;
+            GetComponent<PlayerMovement>().lastPlayerInput = bounceDir * curForce;
+            Debug.DrawRay(this.transform.position, bounceDir * 100f, Color.cyan, 5f);
+        }
+        else
+        {
+            GetComponent<enemySwiper>().curTargetDir = bounceDir * GetComponent<enemySwiper>().curMoveSpeed;
+            Debug.DrawRay(this.transform.position, bounceDir * GetComponent<enemySwiper>().curMoveSpeed, Color.cyan, 5f);
+        }
+        
+        Debug.Log("I am bouncing like a good boy");
     }
 
     public void goOnCD()
@@ -179,27 +200,13 @@ public class fallFromObstacles : MonoBehaviour
         }
     }
 
-  /*  public void enemyBumpEnemy(Collision c)
-    {
-        ContactPoint contact = c.GetContact(0);
-        float dot = Vector3.Dot(GetComponent<enemySwiper>().curTargetDir.normalized, c.gameObject.GetComponent<enemySwiper>().curTargetDir.normalized);
-        Debug.Log("player " + debugPlayerNum + " dot is " + dot);
-        Vector3 newDir = Vector3.Reflect(c.gameObject.GetComponent<enemySwiper>().curTargetDir.normalized, contact.normal);
-        //newDir = newDir.normalized;
-        Debug.Log("my reflection " + newDir);
-        Debug.DrawRay(this.transform.position, newDir * 500f, myDebugColor, 5f);
-        c.gameObject.GetComponent<enemySwiper>().goToBumped(newDir, smallBumpForce);
-    }*/
-
     public void doBump(Collision c, float bForce)
     {
-        ContactPoint contact = c.GetContact(0);    
-        
+        ContactPoint contact = c.GetContact(0);
         if(c.gameObject.GetComponent<fallFromObstacles>().isPlayer) // when an AI collides with a player
         {
 
-            Vector3 newDir = Vector3.Reflect(c.gameObject.GetComponent<PlayerMovement>().lastPlayerInput.normalized, contact.normal);
-            newDir = newDir.normalized;
+            Vector3 newDir = -contact.normal;
             if (newDir != Vector3.zero) // make sure player has movement vector
             {
                 Debug.DrawRay(this.transform.position, newDir * 500f, Color.white, 5f);
@@ -214,36 +221,25 @@ public class fallFromObstacles : MonoBehaviour
         }
         else //when either player or AI bumps into player
         {
-            /*for debugging, trying to figure out dot product for collisions
-            float dot = Vector3.Dot(GetComponent<enemySwiper>().curTargetDir.normalized, contact.point.normalized);
-            Debug.Log("player " + debugPlayerNum + " dot to point is " + dot);
-            float dot2 = Vector3.Dot(c.gameObject.GetComponent<enemySwiper>().curTargetDir.normalized, contact.point.normalized);
-            Debug.Log("player " + debugPlayerNum + " dot to other player is " + dot2);
-
-
-            bool isOpposite = ((dot > 0 && dot2 < 0) || (dot < 0 && dot2 > 0)); //when dot products are opposite, players bounce off each other normally*/
             if(gameObject.GetComponent<fallFromObstacles>().isPlayer)
             {
-                //Vector3 newDir = Vector3.Reflect(c.gameObject.GetComponent<enemySwiper>().curTargetDir.normalized, contact.normal);
-                Vector3 myDir = GetComponent<PlayerMovement>().lastPlayerInput.normalized;
-                if (myDir != Vector3.zero) // make sure player has movement vector
+                Vector3 newDir = -contact.normal;
+                if (newDir != Vector3.zero) // make sure player has movement vector
                 {
-                    Debug.DrawRay(this.transform.position, myDir * 500f, Color.white, 5f);
-                    c.gameObject.GetComponent<enemySwiper>().goToBumped(myDir, bForce);
+                    Debug.DrawRay(this.transform.position, newDir * 500f, Color.white, 5f);
+                    c.gameObject.GetComponent<enemySwiper>().goToBumped(newDir, bForce);
                 }
                 else // otherwise just use vector of AI
                 {
-                    Vector3 newDir = Vector3.Reflect(c.gameObject.GetComponent<enemySwiper>().curTargetDir.normalized, contact.normal);
                     Debug.DrawRay(this.transform.position, newDir * 500f, Color.white, 5f);
                     c.gameObject.GetComponent<enemySwiper>().goToBumped(newDir, bForce);
                 }
             }
             else
             {
-                //Vector3 newDir = Vector3.Reflect(c.gameObject.GetComponent<enemySwiper>().curTargetDir.normalized, contact.normal);
-                Vector3 myDir = GetComponent<enemySwiper>().curTargetDir.normalized;
-                Debug.DrawRay(this.transform.position, myDir * 500f, myDebugColor, 5f);
-                c.gameObject.GetComponent<enemySwiper>().goToBumped(myDir, bForce);
+                Vector3 newDir = -contact.normal;
+                Debug.DrawRay(this.transform.position, newDir * 500f, myDebugColor, 5f);
+                c.gameObject.GetComponent<enemySwiper>().goToBumped(newDir, bForce);
             }            
 
         }

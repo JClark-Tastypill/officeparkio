@@ -164,7 +164,7 @@ public class PlayerMovement : MonoBehaviour
     public void getBumped(Vector3 newDir, float bumpForce)
     {
         //Debug.Log("player bumped");
-        lastPlayerInput += newDir * bumpForce;
+        lastPlayerInput = newDir * bumpForce;
         beingBumped = true;
         bumpStamp = Time.time + bumpTime;
     }

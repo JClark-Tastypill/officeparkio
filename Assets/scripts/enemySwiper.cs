@@ -145,7 +145,7 @@ public class enemySwiper : MonoBehaviour
 
     public void goToBumped(Vector3 bumpDir, float bForce)
     {
-        changeAnim(1);
+        changeAnim(4);
         isWaiting = false;
         target = bumpDir * bForce;
         curMoveSpeed = bForce;
@@ -564,6 +564,6 @@ public class enemySwiper : MonoBehaviour
     public void changeAnim(int animState)
     {
         anim.SetInteger("anim state", animState);
-        Debug.Log("changing state to " + animState);
+        //Debug.Log("changing state to " + animState);
     }
 }

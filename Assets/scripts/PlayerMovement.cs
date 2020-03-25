@@ -27,9 +27,13 @@ public class PlayerMovement : MonoBehaviour
     public DebugFloat maxDashSwipeLength = 50, minDashForce = 20f, sameTouchSwipeDist = 175;
     public GameObject myCharacter;
     public Animator anim;
+    private float animNum;
+    private bool isTouching;
+    public bool victory;
     private void Start()
     {
         anim = myCharacter.gameObject.GetComponent<Animator>();
+        changeAnim(1);
         isAlive = true;
         rb = GetComponent<Rigidbody>();
         /*  
@@ -57,107 +61,130 @@ public class PlayerMovement : MonoBehaviour
     {
        // Debug.Log("last player input mag: " + lastPlayerInput.magnitude);
        // Debug.Log("rb vel: " + rb.velocity.magnitude);
-       if(!canKick)
+       if(!victory)
         {
-            if (Time.fixedTime >= kickCDStamp)
+            if (!canKick)
             {
-                changeAnim(1);
-                canKick = true;
-            }
-        }
-        
-        if(beingBumped)
-        {
-            if (Time.fixedTime >= bumpStamp)
-            {
-                changeAnim(1);
-                beingBumped = false;
-            }
-        }
-        
-
-        if (Input.touchCount > 0) // touching screen
-        {
-            if (Input.GetTouch(0).phase == TouchPhase.Began)
-            {
-                tapStartPosition = Input.GetTouch(0).position;
-                changeAnim(2);
-            }
-
-            Vector2 currentTapLocation = Input.GetTouch(0).position;
-            Vector2 inputDiff = currentTapLocation - tapStartPosition; // difference between original touch and current touch, based on screen location
-
-            if (inputDiff.magnitude > maxDragDistance) //if the player moves their finger too far away from original touch
-            {
-                tapStartPosition = currentTapLocation - inputDiff.normalized * maxDragDistance; //change the new "start" touch location for more accurate measurements
-                inputDiff = currentTapLocation - tapStartPosition;
-            }
-
-            //check to see if a big swipe was made without letting go of screen //////////////
-            float bigSwipeMag = Input.GetTouch(0).deltaPosition.magnitude;
-            //Debug.Log("swipe magnitude: " + bigSwipeMag + ", max swipe: " + sameTouchSwipeDist);
-            if (bigSwipeMag >= sameTouchSwipeDist && canKick)
-            {
-                //doKick(new Vector3(inputDiff.x, 0, inputDiff.y));
-            }
-
-            // check to see if player swipes to do a big kick in that direction//////////////////
-            if (Input.GetTouch(0).phase == TouchPhase.Ended) // touch end
-            {
-
-                Debug.Log("finger lifted");
-                changeAnim(1);
-                float swipeMag = Input.GetTouch(0).deltaPosition.magnitude;
-                if (swipeMag >= maxDashSwipeLength && canKick && !beingBumped)
+                if (Time.fixedTime >= kickCDStamp)
                 {
-                    doKick(new Vector3(inputDiff.x, 0, inputDiff.y));
+                    if (isTouching)
+                    {
+                        changeAnim(2);
+                    }
+                    else
+                    {
+                        Debug.Log("kick changing animation");
+                        changeAnim(1);
+                    }
+
+                    canKick = true;
+                }
+            }
+
+            if (beingBumped)
+            {
+                if (Time.fixedTime >= bumpStamp)
+                {
+                    if (isTouching)
+                    {
+                        changeAnim(2);
+                    }
+                    else
+                    {
+                        Debug.Log("bump changing animation");
+                        changeAnim(1);
+                    }
+                    beingBumped = false;
+                }
+            }
+
+
+            if (Input.touchCount > 0) // touching screen
+            {
+                if (Input.GetTouch(0).phase == TouchPhase.Began)
+                {
+                    tapStartPosition = Input.GetTouch(0).position;
+                    changeAnim(2);
+                    isTouching = true;
+                }
+
+                Vector2 currentTapLocation = Input.GetTouch(0).position;
+                Vector2 inputDiff = currentTapLocation - tapStartPosition; // difference between original touch and current touch, based on screen location
+
+                if (inputDiff.magnitude > maxDragDistance) //if the player moves their finger too far away from original touch
+                {
+                    tapStartPosition = currentTapLocation - inputDiff.normalized * maxDragDistance; //change the new "start" touch location for more accurate measurements
+                    inputDiff = currentTapLocation - tapStartPosition;
+                }
+
+                //check to see if a big swipe was made without letting go of screen //////////////
+                float bigSwipeMag = Input.GetTouch(0).deltaPosition.magnitude;
+                //Debug.Log("swipe magnitude: " + bigSwipeMag + ", max swipe: " + sameTouchSwipeDist);
+                if (bigSwipeMag >= sameTouchSwipeDist && canKick)
+                {
+                    //doKick(new Vector3(inputDiff.x, 0, inputDiff.y));
+                }
+
+                // check to see if player swipes to do a big kick in that direction//////////////////
+                if (Input.GetTouch(0).phase == TouchPhase.Ended) // touch end
+                {
+                    //Debug.Log("touch ended");
+                    isTouching = false;
+                    Debug.Log("figer lift change animation: " + Time.time);
+                    changeAnim(1); // idle animation
+                    float swipeMag = Input.GetTouch(0).deltaPosition.magnitude;
+                    if (swipeMag >= maxDashSwipeLength && canKick && !beingBumped)
+                    {
+                        doKick(new Vector3(inputDiff.x, 0, inputDiff.y));
+                    }
+                }
+
+                if (canKick && !beingBumped)
+                {
+                    float t = inputDiff.magnitude / maxDragDistance; //percentage of max speed, max drag distance is edge of joystick
+                    float targetMoveSpeed = Mathf.Lerp(0f, maxSpeed, t); // target speed is based on the above percentage and maxspeed
+                    moveSpeed = targetMoveSpeed;
+                    //moveSpeed = Mathf.MoveTowards(moveSpeed, targetMoveSpeed, accelerationSpeed * Time.fixedDeltaTime); //start to acceleratate towards target speed, but not faster than acceration speed * time
+                    Vector3 targetMoveVector = new Vector3(inputDiff.x, 0f, inputDiff.y).normalized * moveSpeed; //targetmovevector is the movement vector based on direction and speed;
+                    lastPlayerInput = Vector3.MoveTowards(lastPlayerInput, targetMoveVector, accelerationSpeed * Time.fixedDeltaTime); // lerps to target vector based on current, at acceleraton
+                }
+            }
+            else // not touching
+            {
+                //decelerate if not touching
+                if (!beingBumped)
+                {
+
+                    if (canKick)
+                    {
+                        //moveSpeed = Mathf.MoveTowards(moveSpeed, 0f, Time.fixedDeltaTime * decelerationSpeed);
+                    }
+                    else
+                    {
+                        //moveSpeed = Mathf.MoveTowards(moveSpeed, 0f, Time.fixedDeltaTime * (decelerationSpeed * 2)); // slow down less when dashing
+                    }
+                    moveSpeed = Mathf.MoveTowards(moveSpeed, 0f, Time.fixedDeltaTime * decelerationSpeed); // slow down less when dashing
+                    Vector3 targetMoveVector = lastPlayerInput.normalized * moveSpeed;
+                    lastPlayerInput = Vector3.MoveTowards(lastPlayerInput, targetMoveVector, accelerationSpeed * Time.fixedDeltaTime);
                 }
                 else
                 {
-                    
                 }
             }
 
-            if(canKick && !beingBumped)
+            // move player every frame some amount
+            if (isAlive)
             {
-                float t = inputDiff.magnitude / maxDragDistance; //percentage of max speed, max drag distance is edge of joystick
-                float targetMoveSpeed = Mathf.Lerp(0f, maxSpeed, t); // target speed is based on the above percentage and maxspeed
-                moveSpeed = targetMoveSpeed;
-                //moveSpeed = Mathf.MoveTowards(moveSpeed, targetMoveSpeed, accelerationSpeed * Time.fixedDeltaTime); //start to acceleratate towards target speed, but not faster than acceration speed * time
-                Vector3 targetMoveVector = new Vector3(inputDiff.x, 0f, inputDiff.y).normalized * moveSpeed; //targetmovevector is the movement vector based on direction and speed;
-                lastPlayerInput = Vector3.MoveTowards(lastPlayerInput, targetMoveVector, accelerationSpeed * Time.fixedDeltaTime); // lerps to target vector based on current, at acceleraton
-            }
-        }
-        else // not touching
-        {
-            //decelerate if not touching
-            if (!beingBumped)
-            {
-                if(canKick)
+                rb.MovePosition(transform.position + lastPlayerInput * Time.fixedDeltaTime);
+
+                if (lastPlayerInput.magnitude > 0.1f)
                 {
-                    //moveSpeed = Mathf.MoveTowards(moveSpeed, 0f, Time.fixedDeltaTime * decelerationSpeed);
+                    Quaternion newLook = Quaternion.LookRotation(lastPlayerInput);
+                    rb.MoveRotation(Quaternion.Lerp(transform.rotation, newLook, rotationSpeed * Time.deltaTime));
                 }
-                else
-                {
-                    //moveSpeed = Mathf.MoveTowards(moveSpeed, 0f, Time.fixedDeltaTime * (decelerationSpeed * 2)); // slow down less when dashing
-                }
-                moveSpeed = Mathf.MoveTowards(moveSpeed, 0f, Time.fixedDeltaTime * decelerationSpeed); // slow down less when dashing
-                Vector3 targetMoveVector = lastPlayerInput.normalized * moveSpeed;
-                lastPlayerInput = Vector3.MoveTowards(lastPlayerInput, targetMoveVector, accelerationSpeed * Time.fixedDeltaTime);
             }
         }
-
-        // move player every frame some amount
-        if(isAlive)
-        {
-            rb.MovePosition(transform.position + lastPlayerInput * Time.fixedDeltaTime);
-
-            if (lastPlayerInput.magnitude > 0.1f)
-            {
-                Quaternion newLook = Quaternion.LookRotation(lastPlayerInput);
-                rb.MoveRotation(Quaternion.Lerp(transform.rotation, newLook, rotationSpeed * Time.deltaTime));
-            }
-        }
+       
         
     }
 
@@ -179,44 +206,19 @@ public class PlayerMovement : MonoBehaviour
         lastPlayerInput = newDir * bumpForce;
         beingBumped = true;
         bumpStamp = Time.time + bumpTime;
-        changeAnim(1);
+        changeAnim(4);
     }
 
     public void changeAnim(int animState)
     {
+        animNum = animState;
         anim.SetInteger("anim state", animState);
-        Debug.Log("changing state to " + animState);
-       /* if(animState == 0) //dead
-        {
+        Debug.Log("changing state to " + animState + "at time: " + Time.time);       
+    }
 
-            anim.SetBool("dead", true);
-            anim.SetBool("idle", false);
-            anim.SetBool("peddling", false);
-            anim.SetBool("kick", false);
-        }
-        if (animState == 1) //idle
-        {
-            Debug.Log("idle animation");
-            anim.SetBool("dead", false);
-            anim.SetBool("idle", true);
-            anim.SetBool("peddling", false);
-            anim.SetBool("kick", false);
-        }
-        if (animState == 2) //peddling
-        {
-            Debug.Log("peddle animation");
-            anim.SetBool("dead", false);
-            anim.SetBool("idle", false);
-            anim.SetBool("peddling", true);
-            anim.SetBool("kick", false);
-        }
-        if (animState == 3) //big kick
-        {
-            Debug.Log("kick animation");
-            anim.SetBool("dead", false);
-            anim.SetBool("idle", false);
-            anim.SetBool("peddling", false);
-            anim.SetBool("kick", true);
-        }*/
+    public void startWin()
+    {
+        victory = true;
+        changeAnim(5);
     }
 }

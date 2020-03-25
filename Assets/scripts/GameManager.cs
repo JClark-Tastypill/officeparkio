@@ -5,6 +5,7 @@ using UnityEngine;
 public class GameManager : MonoBehaviour
 {
     public GameObject thePlayer;
+    public int numEnemies;
     // Start is called before the first frame update
     void Start()
     {
@@ -19,6 +20,15 @@ public class GameManager : MonoBehaviour
         {
             Application.LoadLevel("office test");
             
+        }
+    }
+
+    public void updateEnemyCount()
+    {
+        numEnemies--;
+        if(numEnemies <= 0)
+        {
+            thePlayer.GetComponent<PlayerMovement>().startWin();
         }
     }
 

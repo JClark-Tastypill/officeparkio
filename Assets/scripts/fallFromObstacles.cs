@@ -20,7 +20,7 @@ public class fallFromObstacles : MonoBehaviour
     public int debugPlayerNum;
     public float minReflectValue; // if dot product is below this, do opposite bump
     public DebugFloat bigBumpF = 70f, mediumBumpF = 40f, smallBumpF = 15f, fallOffVelocity = 30f;
-
+    public GameObject myAdmin;
     // Start is called before the first frame update
     void Start()
     {
@@ -74,7 +74,17 @@ public class fallFromObstacles : MonoBehaviour
             }
             if (collision.gameObject.tag == "obstacle") //when obstacles, see if they can fall off, otherwise bounce off
             {
-                if(GetComponent<PlayerMovement>().beingBumped)
+                if (GetComponent<PlayerMovement>().beingBumped)
+                {
+                    if (GetComponent<PlayerMovement>().lastPlayerInput.magnitude >= fallOffVelocity)
+                    {
+                        startDeath();
+                    }
+                }
+            }
+            if (collision.gameObject.tag == "wall") //when obstacles, see if they can fall off, otherwise bounce off
+            {
+                if (GetComponent<PlayerMovement>().beingBumped)
                 {
                     if (GetComponent<PlayerMovement>().lastPlayerInput.magnitude >= fallOffVelocity)
                     {
@@ -85,7 +95,7 @@ public class fallFromObstacles : MonoBehaviour
                         bounceOffWall(collision);
                     }
                 }
-                else
+                if (!GetComponent<PlayerMovement>().canKick)
                 {
                     bounceOffWall(collision);
                 }
@@ -145,15 +155,25 @@ public class fallFromObstacles : MonoBehaviour
                     {
                         startDeath();
                     }
-                    else
-                    {
-                        Debug.Log("enemy reflect!");
-                        bounceOffWall(collision);
-                    }
                 }
                 else
                 {
                     GetComponent<enemySwiper>().determineState();
+                }
+            }
+            if (collision.gameObject.tag == "wall") //when obstacles, see if they can fall off, otherwise bounce off
+            {
+                if (GetComponent<enemySwiper>().beingBumped)
+                {
+                    if (GetComponent<enemySwiper>().curTargetDir.magnitude >= fallOffVelocity)
+                    {
+                        startDeath();
+                    }
+                }
+                else
+                {
+
+                    bounceOffWall(collision);
                 }
             }
         }
@@ -162,20 +182,22 @@ public class fallFromObstacles : MonoBehaviour
     public void bounceOffWall(Collision c)
     {
         ContactPoint contact = c.GetContact(0);
-        Vector3 bounceDir = contact.normal;
+        
         if(isPlayer)
         {
+            Vector3 bounceDir = Vector3.Reflect(GetComponent<PlayerMovement>().lastPlayerInput.normalized, contact.normal);
             float curForce = GetComponent<PlayerMovement>().lastPlayerInput.magnitude;
             GetComponent<PlayerMovement>().lastPlayerInput = bounceDir * curForce;
             Debug.DrawRay(this.transform.position, bounceDir * 100f, Color.cyan, 5f);
         }
         else
         {
+            Vector3 bounceDir = Vector3.Reflect(GetComponent<enemySwiper>().curTargetDir.normalized, contact.normal);
             GetComponent<enemySwiper>().curTargetDir = bounceDir * GetComponent<enemySwiper>().curMoveSpeed;
             Debug.DrawRay(this.transform.position, bounceDir * GetComponent<enemySwiper>().curMoveSpeed, Color.cyan, 5f);
         }
         
-        Debug.Log("I am bouncing like a good boy");
+        //Debug.Log("I am bouncing like a good boy");
     }
 
     public void goOnCD()
@@ -195,8 +217,10 @@ public class fallFromObstacles : MonoBehaviour
         }
         else
         {
+            myAdmin.GetComponent<GameManager>().updateEnemyCount();
             GetComponent<enemySwiper>().isAlive = false;
             myHuman.GetComponent<ragdollController>().startEnemyRagdoll();
+
         }
     }
 

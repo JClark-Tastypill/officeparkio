@@ -25,9 +25,11 @@ public class PlayerMovement : MonoBehaviour
     public bool beingBumped;
     public float bumpTime, bumpStamp;
     public DebugFloat maxDashSwipeLength = 50, minDashForce = 20f, sameTouchSwipeDist = 175;
-
+    public GameObject myCharacter;
+    public Animator anim;
     private void Start()
     {
+        anim = myCharacter.gameObject.GetComponent<Animator>();
         isAlive = true;
         rb = GetComponent<Rigidbody>();
         /*  
@@ -59,6 +61,7 @@ public class PlayerMovement : MonoBehaviour
         {
             if (Time.fixedTime >= kickCDStamp)
             {
+                changeAnim(1);
                 canKick = true;
             }
         }
@@ -67,6 +70,7 @@ public class PlayerMovement : MonoBehaviour
         {
             if (Time.fixedTime >= bumpStamp)
             {
+                changeAnim(1);
                 beingBumped = false;
             }
         }
@@ -77,6 +81,7 @@ public class PlayerMovement : MonoBehaviour
             if (Input.GetTouch(0).phase == TouchPhase.Began)
             {
                 tapStartPosition = Input.GetTouch(0).position;
+                changeAnim(2);
             }
 
             Vector2 currentTapLocation = Input.GetTouch(0).position;
@@ -99,13 +104,19 @@ public class PlayerMovement : MonoBehaviour
             // check to see if player swipes to do a big kick in that direction//////////////////
             if (Input.GetTouch(0).phase == TouchPhase.Ended) // touch end
             {
+
+                Debug.Log("finger lifted");
+                changeAnim(1);
                 float swipeMag = Input.GetTouch(0).deltaPosition.magnitude;
                 if (swipeMag >= maxDashSwipeLength && canKick && !beingBumped)
                 {
                     doKick(new Vector3(inputDiff.x, 0, inputDiff.y));
                 }
+                else
+                {
+                    
+                }
             }
-
 
             if(canKick && !beingBumped)
             {
@@ -159,6 +170,7 @@ public class PlayerMovement : MonoBehaviour
         Quaternion newLook = Quaternion.LookRotation(newDir);
         rb.MoveRotation(Quaternion.Lerp(transform.rotation, newLook, rotationSpeed * Time.deltaTime));
         canKick = false;
+        changeAnim(3);
     }
 
     public void getBumped(Vector3 newDir, float bumpForce)
@@ -167,5 +179,44 @@ public class PlayerMovement : MonoBehaviour
         lastPlayerInput = newDir * bumpForce;
         beingBumped = true;
         bumpStamp = Time.time + bumpTime;
+        changeAnim(1);
+    }
+
+    public void changeAnim(int animState)
+    {
+        anim.SetInteger("anim state", animState);
+        Debug.Log("changing state to " + animState);
+       /* if(animState == 0) //dead
+        {
+
+            anim.SetBool("dead", true);
+            anim.SetBool("idle", false);
+            anim.SetBool("peddling", false);
+            anim.SetBool("kick", false);
+        }
+        if (animState == 1) //idle
+        {
+            Debug.Log("idle animation");
+            anim.SetBool("dead", false);
+            anim.SetBool("idle", true);
+            anim.SetBool("peddling", false);
+            anim.SetBool("kick", false);
+        }
+        if (animState == 2) //peddling
+        {
+            Debug.Log("peddle animation");
+            anim.SetBool("dead", false);
+            anim.SetBool("idle", false);
+            anim.SetBool("peddling", true);
+            anim.SetBool("kick", false);
+        }
+        if (animState == 3) //big kick
+        {
+            Debug.Log("kick animation");
+            anim.SetBool("dead", false);
+            anim.SetBool("idle", false);
+            anim.SetBool("peddling", false);
+            anim.SetBool("kick", true);
+        }*/
     }
 }

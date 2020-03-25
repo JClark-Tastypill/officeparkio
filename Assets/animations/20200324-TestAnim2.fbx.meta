@@ -141,7 +141,7 @@ ModelImporter:
     400132: mixamorig:Spine
     400134: mixamorig:Spine1
     400136: mixamorig:Spine2
-    7400000: new take
+    7400000: peddling
     9500000: //RootNode
   externalObjects: {}
   materials:
@@ -172,7 +172,7 @@ ModelImporter:
     extraUserProperties: []
     clipAnimations:
     - serializedVersion: 16
-      name: new take
+      name: peddling
       takeName: Take 001
       firstFrame: 0
       lastFrame: 110

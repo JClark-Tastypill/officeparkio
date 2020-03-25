@@ -39,6 +39,8 @@ public class enemySwiper : MonoBehaviour
     public float waitTimelow, waitTimeHigh;
     private bool isWaiting;
     public float chanceRunAway;
+    public GameObject myCharacter;
+    public Animator anim;
     public enum EnemyState
     {
         None,
@@ -53,7 +55,7 @@ public class enemySwiper : MonoBehaviour
 
     void Start()
     {
-        
+        anim = myCharacter.gameObject.GetComponent<Animator>();
         rb = GetComponent<Rigidbody>();
         findOthers(); // runs once, creates array of other players in the stage
         determineState(); 
@@ -96,6 +98,7 @@ public class enemySwiper : MonoBehaviour
     public void gotoRoam()
     {
         //Debug.Log("go to roam");
+        changeAnim(2);
         checkClosestPlayer();
         if (Time.fixedTime >= dashStamp)
         {
@@ -120,6 +123,7 @@ public class enemySwiper : MonoBehaviour
     public void goToAggro()
     {
         //Debug.Log("go to aggro");
+        changeAnim(2);
         checkClosestPlayer();
         pathFind();
         newMoveSpeed(2);
@@ -130,6 +134,7 @@ public class enemySwiper : MonoBehaviour
     public void goToDash()
     {
         //Debug.Log("go to dash");
+        changeAnim(3);
         checkClosestPlayer();
         pathFind();
         newMoveSpeed(3);
@@ -140,6 +145,7 @@ public class enemySwiper : MonoBehaviour
 
     public void goToBumped(Vector3 bumpDir, float bForce)
     {
+        changeAnim(1);
         isWaiting = false;
         target = bumpDir * bForce;
         curMoveSpeed = bForce;
@@ -151,7 +157,8 @@ public class enemySwiper : MonoBehaviour
     public void goToHide()
     {
         //Debug.Log("go to hide");
-        if(chanceRunAway * 2 >= Random.Range(1, 101))
+        changeAnim(2);
+        if (chanceRunAway * 2 >= Random.Range(1, 101))
         {
             randomPathfind();
         }
@@ -166,6 +173,7 @@ public class enemySwiper : MonoBehaviour
 
     public void goToWait()
     {
+        changeAnim(1);
         beingBumped = false;
         isAgro = false;
         isDashing = false;
@@ -551,5 +559,11 @@ public class enemySwiper : MonoBehaviour
         isDashing = true;
         //isSlow = false;
         curMoveSpeed = dashForce;
+    }
+
+    public void changeAnim(int animState)
+    {
+        anim.SetInteger("anim state", animState);
+        Debug.Log("changing state to " + animState);
     }
 }

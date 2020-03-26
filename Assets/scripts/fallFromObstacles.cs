@@ -208,8 +208,8 @@ public class fallFromObstacles : MonoBehaviour
 
     public void startDeath()
     {
-        timeToDie = true; ;
-
+        timeToDie = true;
+        Debug.Log("death starting");
         if (isPlayer)
         {
             GetComponent<PlayerMovement>().isAlive = false;
@@ -217,7 +217,7 @@ public class fallFromObstacles : MonoBehaviour
         }
         else
         {
-            myAdmin.GetComponent<GameManager>().updateEnemyCount();
+            
             GetComponent<enemySwiper>().isAlive = false;
             myHuman.GetComponent<ragdollController>().startEnemyRagdoll();
 

@@ -6,7 +6,7 @@ public class ragdollController : MonoBehaviour
 {
     // Start is called before the first frame update
     public Animator anim;
-    public GameObject myParent, myChair, myCam;
+    public GameObject myParent, myChair, myCam, myAdmin;
     public float clearTime, clearTimer;
     public bool ragdollActive, isPlayer;
 
@@ -119,7 +119,7 @@ public class ragdollController : MonoBehaviour
 
     public void cleanRagdoll()
     {
-
+        myAdmin.GetComponent<GameManager>().updateEnemyCount();
         toggleChairColliders(true);
         gameObject.SetActive(false);
         myParent.gameObject.SetActive(false);

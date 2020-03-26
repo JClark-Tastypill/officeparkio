@@ -12773,6 +12773,16 @@ PrefabInstance:
       propertyPath: myCam
       value: 
       objectReference: {fileID: 1642548955}
+    - target: {fileID: 7087610767370042861, guid: ae39200c020c64ff8bd4b89840023683,
+        type: 3}
+      propertyPath: myAdmin
+      value: 
+      objectReference: {fileID: 1120029552}
+    - target: {fileID: 7087610767370042861, guid: ae39200c020c64ff8bd4b89840023683,
+        type: 3}
+      propertyPath: clearTime
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 7088125311007245546, guid: ae39200c020c64ff8bd4b89840023683,
         type: 3}
       propertyPath: m_IsActive
@@ -15786,6 +15796,16 @@ PrefabInstance:
       propertyPath: myCam
       value: 
       objectReference: {fileID: 1642548955}
+    - target: {fileID: 7087610767370042861, guid: ae39200c020c64ff8bd4b89840023683,
+        type: 3}
+      propertyPath: myAdmin
+      value: 
+      objectReference: {fileID: 1120029552}
+    - target: {fileID: 7087610767370042861, guid: ae39200c020c64ff8bd4b89840023683,
+        type: 3}
+      propertyPath: clearTime
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 7087834415185355094, guid: ae39200c020c64ff8bd4b89840023683,
         type: 3}
       propertyPath: m_IsActive
@@ -23878,6 +23898,16 @@ PrefabInstance:
       propertyPath: myCam
       value: 
       objectReference: {fileID: 1642548955}
+    - target: {fileID: 7087610767370042861, guid: ae39200c020c64ff8bd4b89840023683,
+        type: 3}
+      propertyPath: myAdmin
+      value: 
+      objectReference: {fileID: 1120029552}
+    - target: {fileID: 7087610767370042861, guid: ae39200c020c64ff8bd4b89840023683,
+        type: 3}
+      propertyPath: clearTime
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 7136477117159144832, guid: ae39200c020c64ff8bd4b89840023683,
         type: 3}
       propertyPath: m_Avatar
@@ -25151,6 +25181,7 @@ MonoBehaviour:
   myParent: {fileID: 0}
   myChair: {fileID: 0}
   myCam: {fileID: 0}
+  myAdmin: {fileID: 0}
   clearTime: 0
   clearTimer: 0
   ragdollActive: 0

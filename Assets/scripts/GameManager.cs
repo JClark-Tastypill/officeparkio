@@ -25,6 +25,7 @@ public class GameManager : MonoBehaviour
 
     public void updateEnemyCount()
     {
+        Debug.Log("enemy count changed");
         numEnemies--;
         if(numEnemies <= 0)
         {
